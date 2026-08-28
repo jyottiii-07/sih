@@ -1,0 +1,14 @@
+{
+  "_comment": "REAL-DATA SCHEMA FIXTURE: Single-record telemetry example matching physical hardware contract. This is for software testing and interface verification only; it is NOT real sensor data.",
+  "fixture_type": "REAL-DATA SCHEMA FIXTURE",
+  "disclaimer": "SYNTHETIC DEVELOPMENT FIXTURE ONLY - NOT PHYSICAL SENSOR DATA",
+  "record": {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:00",
+    "x": 5.0,
+    "y": 5.1,
+    "bx": 0.1845,
+    "by": 0.1725,
+    "bz": 0.3488
+  }
+}

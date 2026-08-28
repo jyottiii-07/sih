@@ -1,0 +1,14 @@
+[
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:00",
+    "x": 5.0,
+    "y": 5.1,
+    "bx": 0.1845,
+    "by": 0.1725,
+    "bz": 0.3488,
+    "magnetic_signal": 0.4306,
+    "anomaly_score": 0.3933,
+    "classification": "low_anomaly"
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:00",
+    "x": 5.0,
+    "y": 5.0,
+    "bx": 0.1845,
+    "by": 0.1725,
+    "bz": 0.3488,
+    "magnetic_signal": 0.4306,
+    "anomaly_score": 0.4203,
+    "classification": "low_anomaly"
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:01",
+    "x": 6.0,
+    "y": 5.0,
+    "bx": 0.1852,
+    "by": 0.1731,
+    "bz": 0.3495,
+    "magnetic_signal": 0.4318,
+    "anomaly_score": 0.4926,
+    "classification": "low_anomaly"
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:02",
+    "x": 7.0,
+    "y": 5.1,
+    "bx": 0.186,
+    "by": 0.174,
+    "bz": 0.3502,
+    "magnetic_signal": 0.433,
+    "anomaly_score": 0.4868,
+    "classification": "low_anomaly"
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:03",
+    "x": 8.0,
+    "y": 5.0,
+    "bx": 0.245,
+    "by": 0.231,
+    "bz": 0.42,
+    "magnetic_signal": 0.5383,
+    "anomaly_score": 0.6326,
+    "classification": "low_anomaly"
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:04",
+    "x": 9.0,
+    "y": 5.1,
+    "bx": 0.312,
+    "by": 0.298,
+    "bz": 0.51,
+    "magnetic_signal": 0.668,
+    "anomaly_score": 0.8256,
+    "classification": "high_anomaly"
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:05",
+    "x": 10.0,
+    "y": 5.0,
+    "bx": 0.188,
+    "by": 0.175,
+    "bz": 0.352,
+    "magnetic_signal": 0.4357,
+    "anomaly_score": 0.581,
+    "classification": "low_anomaly"
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:06",
+    "x": 11.0,
+    "y": 5.2,
+    "bx": 0.185,
+    "by": 0.173,
+    "bz": 0.349,
+    "magnetic_signal": 0.4312,
+    "anomaly_score": 0.5131,
+    "classification": "low_anomaly"
+  }
+]
