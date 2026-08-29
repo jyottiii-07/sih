@@ -49,20 +49,20 @@ export const LogsTable: React.FC<LogsTableProps> = ({
     return (
       <th
         onClick={() => handleSort(field)}
-        className={`py-3 px-3 cursor-pointer select-none hover:text-cyan-300 transition-colors font-mono text-[11px] uppercase tracking-wider text-${align} ${
-          isCurrent ? 'text-cyan-400 font-bold' : 'text-slate-400'
+        className={`py-3 px-3 cursor-pointer select-none hover:text-slate-900 transition-colors font-mono text-[11px] uppercase tracking-wider text-${align} ${
+          isCurrent ? 'text-blue-600 font-bold' : 'text-slate-500'
         }`}
       >
         <div className={`inline-flex items-center gap-1.5 justify-${align === 'right' ? 'end' : align === 'center' ? 'center' : 'start'}`}>
           <span>{label}</span>
           {isCurrent ? (
             sortOrder === 'asc' ? (
-              <ArrowUp className="w-3.5 h-3.5 text-cyan-400" />
+              <ArrowUp className="w-3.5 h-3.5 text-blue-600" />
             ) : (
-              <ArrowDown className="w-3.5 h-3.5 text-cyan-400" />
+              <ArrowDown className="w-3.5 h-3.5 text-blue-600" />
             )
           ) : (
-            <ArrowUpDown className="w-3 h-3 text-slate-600 opacity-60" />
+            <ArrowUpDown className="w-3 h-3 text-slate-400 opacity-60" />
           )}
         </div>
       </th>
@@ -70,9 +70,9 @@ export const LogsTable: React.FC<LogsTableProps> = ({
   };
 
   return (
-    <div className="w-full overflow-x-auto bg-[#0e1626] border border-[#1f324d] rounded-xl shadow-xl">
+    <div className="w-full overflow-x-auto bg-white border border-slate-200 rounded-lg shadow-sm">
       <table className="w-full text-left text-xs border-collapse">
-        <thead className="bg-[#0a101b] border-b border-[#1f324d] sticky top-0 z-10">
+        <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
           <tr>
             {renderSortHeader('Timestamp', 'timestamp', 'left')}
             {renderSortHeader('Sensor ID', 'sensor_id', 'left')}
@@ -86,7 +86,7 @@ export const LogsTable: React.FC<LogsTableProps> = ({
             {renderSortHeader('Classification', 'classification', 'center')}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#1f324d]/40 font-mono">
+        <tbody className="divide-y divide-slate-100 font-mono">
           {sortedReadings.map((r, idx) => {
             const isSelected =
               selectedReading?.timestamp === r.timestamp &&
@@ -99,36 +99,36 @@ export const LogsTable: React.FC<LogsTableProps> = ({
                 onClick={() => onSelectReading(r)}
                 className={`cursor-pointer transition-colors duration-100 ${
                   isSelected
-                    ? 'bg-cyan-950/60 border-l-4 border-cyan-400'
-                    : 'hover:bg-[#152238]/70'
+                    ? 'bg-blue-50/80 border-l-4 border-blue-600 font-medium'
+                    : 'hover:bg-slate-50'
                 }`}
               >
                 {/* Timestamp */}
-                <td className="py-2.5 px-3 text-slate-300 whitespace-nowrap">
+                <td className="py-2.5 px-3 text-slate-700 whitespace-nowrap">
                   {new Date(r.timestamp).toISOString()}
                 </td>
 
                 {/* Sensor ID */}
-                <td className="py-2.5 px-3 text-slate-300 font-bold">
+                <td className="py-2.5 px-3 text-slate-900 font-semibold">
                   {r.sensor_id}
                 </td>
 
                 {/* X, Y */}
-                <td className="py-2.5 px-3 text-right text-slate-200">{r.x.toFixed(1)}</td>
-                <td className="py-2.5 px-3 text-right text-slate-200">{r.y.toFixed(1)}</td>
+                <td className="py-2.5 px-3 text-right text-slate-700">{r.x.toFixed(1)}</td>
+                <td className="py-2.5 px-3 text-right text-slate-700">{r.y.toFixed(1)}</td>
 
                 {/* Bx, By, Bz */}
-                <td className="py-2.5 px-3 text-right text-sky-400">{r.bx.toFixed(2)}</td>
-                <td className="py-2.5 px-3 text-right text-indigo-400">{r.by.toFixed(2)}</td>
-                <td className="py-2.5 px-3 text-right text-purple-400">{r.bz.toFixed(2)}</td>
+                <td className="py-2.5 px-3 text-right text-sky-700">{r.bx.toFixed(2)}</td>
+                <td className="py-2.5 px-3 text-right text-indigo-700">{r.by.toFixed(2)}</td>
+                <td className="py-2.5 px-3 text-right text-purple-700">{r.bz.toFixed(2)}</td>
 
                 {/* Magnetic Signal */}
-                <td className="py-2.5 px-3 text-right font-bold text-cyan-300">
+                <td className="py-2.5 px-3 text-right font-bold text-blue-700">
                   {r.magnetic_signal.toFixed(2)}
                 </td>
 
                 {/* Anomaly Score */}
-                <td className="py-2.5 px-3 text-right text-slate-100 font-bold">
+                <td className="py-2.5 px-3 text-right text-slate-900 font-semibold">
                   {r.anomaly_score.toFixed(2)}
                 </td>
 

@@ -11,35 +11,34 @@ interface RecentReadingsTableProps {
 export const RecentReadingsTable: React.FC<RecentReadingsTableProps> = ({ onOpenLogs }) => {
   const { readings, selectedReading, setSelectedReading } = useSensorData();
 
-  // Last 8 readings in reverse chronological order
   const recentList = [...readings].slice(-8).reverse();
 
   return (
     <Card
-      title="Recent Telemetry Ingestion Feed"
-      icon={<ListFilter className="w-4 h-4 text-cyan-400" />}
+      title="Recent Telemetry Feed"
+      icon={<ListFilter className="w-4 h-4 text-slate-500" />}
       subtitle="Latest packets received by the frontend data adapter"
       action={
         <button
           onClick={onOpenLogs}
-          className="text-xs text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1 transition-colors"
+          className="text-xs text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1 transition-colors"
         >
-          View Full Logs <ExternalLink className="w-3 h-3" />
+          Full Logs <ExternalLink className="w-3 h-3" />
         </button>
       }
     >
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-[#1f324d] text-slate-400 font-mono text-[11px]">
-              <th className="py-2 px-2">Timestamp</th>
-              <th className="py-2 px-2">Coords (X, Y)</th>
-              <th className="py-2 px-2 text-right">Mag Signal</th>
-              <th className="py-2 px-2 text-right">Anomaly Score</th>
-              <th className="py-2 px-2 text-center">Classification</th>
+            <tr className="border-b border-slate-200 text-slate-500 font-mono text-[11px] bg-slate-50/60">
+              <th className="py-2.5 px-3">Timestamp</th>
+              <th className="py-2.5 px-3">Coords (X, Y)</th>
+              <th className="py-2.5 px-3 text-right">Mag Signal</th>
+              <th className="py-2.5 px-3 text-right">Anomaly Score</th>
+              <th className="py-2.5 px-3 text-center">Classification</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#1f324d]/40">
+          <tbody className="divide-y divide-slate-100">
             {recentList.map((r, idx) => {
               const isSelected =
                 selectedReading?.timestamp === r.timestamp &&
@@ -52,23 +51,23 @@ export const RecentReadingsTable: React.FC<RecentReadingsTableProps> = ({ onOpen
                   onClick={() => setSelectedReading(r)}
                   className={`cursor-pointer transition-colors ${
                     isSelected
-                      ? 'bg-cyan-950/40 border-l-2 border-cyan-400'
-                      : 'hover:bg-[#152238]/60'
+                      ? 'bg-blue-50/80 border-l-2 border-blue-600'
+                      : 'hover:bg-slate-50'
                   }`}
                 >
-                  <td className="py-2 px-2 font-mono text-slate-300 whitespace-nowrap">
+                  <td className="py-2.5 px-3 font-mono text-slate-700 whitespace-nowrap">
                     {new Date(r.timestamp).toLocaleTimeString()}
                   </td>
-                  <td className="py-2 px-2 font-mono text-slate-300">
+                  <td className="py-2.5 px-3 font-mono text-slate-700">
                     ({r.x.toFixed(1)}, {r.y.toFixed(1)})
                   </td>
-                  <td className="py-2 px-2 font-mono text-right text-cyan-300 font-medium">
+                  <td className="py-2.5 px-3 font-mono text-right text-blue-700 font-semibold">
                     {r.magnetic_signal.toFixed(2)}
                   </td>
-                  <td className="py-2 px-2 font-mono text-right text-slate-200">
+                  <td className="py-2.5 px-3 font-mono text-right text-slate-900 font-medium">
                     {r.anomaly_score.toFixed(2)}
                   </td>
-                  <td className="py-2 px-2 text-center">
+                  <td className="py-2.5 px-3 text-center">
                     <AnomalyBadge classification={r.classification} size="sm" showIcon={false} />
                   </td>
                 </tr>

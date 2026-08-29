@@ -39,21 +39,21 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
   };
 
   return (
-    <div className="p-4 bg-[#0e1626] border border-[#1f324d] rounded-xl space-y-3">
+    <div className="p-4 bg-white border border-slate-200 rounded-lg space-y-3 shadow-xs">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Classification Filter Pills */}
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-xs text-slate-400 font-medium mr-1 flex items-center gap-1">
-            <Filter className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="text-xs text-slate-500 font-medium mr-1 flex items-center gap-1">
+            <Filter className="w-3.5 h-3.5 text-slate-400" />
             Class:
           </span>
 
           <button
             onClick={() => setClassification('all')}
-            className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
               filters.classification === 'all'
-                ? 'bg-cyan-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(6,182,212,0.3)]'
-                : 'bg-[#152238] text-slate-400 hover:text-slate-200 border border-[#1f324d]'
+                ? 'bg-slate-900 text-white font-semibold shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
             }`}
           >
             All
@@ -61,10 +61,10 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
 
           <button
             onClick={() => setClassification('normal')}
-            className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
               filters.classification === 'normal'
-                ? 'bg-emerald-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(16,185,129,0.3)]'
-                : 'bg-[#152238] text-slate-400 hover:text-emerald-300 border border-[#1f324d]'
+                ? 'bg-emerald-600 text-white font-semibold shadow-xs'
+                : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
             }`}
           >
             Normal
@@ -72,10 +72,10 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
 
           <button
             onClick={() => setClassification('weak_anomaly')}
-            className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
               filters.classification === 'weak_anomaly'
-                ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(245,158,11,0.3)]'
-                : 'bg-[#152238] text-slate-400 hover:text-amber-300 border border-[#1f324d]'
+                ? 'bg-amber-500 text-white font-semibold shadow-xs'
+                : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
             }`}
           >
             Weak Anomaly
@@ -83,10 +83,10 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
 
           <button
             onClick={() => setClassification('strong_anomaly')}
-            className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
               filters.classification === 'strong_anomaly'
-                ? 'bg-red-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(239,68,68,0.3)]'
-                : 'bg-[#152238] text-slate-400 hover:text-red-300 border border-[#1f324d]'
+                ? 'bg-rose-600 text-white font-semibold shadow-xs'
+                : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200'
             }`}
           >
             Strong Anomaly
@@ -102,7 +102,7 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
               placeholder="Search ID, timestamp..."
               value={filters.searchQuery}
               onChange={handleSearchChange}
-              className="w-full bg-[#070b12] border border-[#1f324d] focus:border-cyan-400 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none transition-colors"
+              className="w-full bg-slate-50 border border-slate-300 focus:border-blue-500 focus:bg-white rounded-md pl-9 pr-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none transition-colors"
             />
           </div>
 
@@ -126,11 +126,11 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
         </div>
       </div>
 
-      {/* Coordinate Bounding Box Filter (Expandable) */}
+      {/* Coordinate Bounding Box Filter */}
       {showCoordFilters && (
-        <div className="p-3 bg-[#070b12] border border-[#1f324d] rounded-lg grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs animate-in fade-in">
+        <div className="p-3 bg-slate-50 border border-slate-200 rounded-md grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs animate-in fade-in">
           <div>
-            <label className="text-[10px] uppercase font-mono text-slate-400 block mb-1">Min X:</label>
+            <label className="text-[11px] uppercase font-mono text-slate-500 block mb-1">Min X:</label>
             <input
               type="number"
               placeholder="0"
@@ -141,11 +141,11 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
                   minX: e.target.value ? Number(e.target.value) : undefined,
                 }))
               }
-              className="w-full bg-[#0e1626] border border-[#1f324d] rounded px-2 py-1 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-400"
+              className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-500"
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase font-mono text-slate-400 block mb-1">Max X:</label>
+            <label className="text-[11px] uppercase font-mono text-slate-500 block mb-1">Max X:</label>
             <input
               type="number"
               placeholder="60"
@@ -156,11 +156,11 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
                   maxX: e.target.value ? Number(e.target.value) : undefined,
                 }))
               }
-              className="w-full bg-[#0e1626] border border-[#1f324d] rounded px-2 py-1 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-400"
+              className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-500"
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase font-mono text-slate-400 block mb-1">Min Y:</label>
+            <label className="text-[11px] uppercase font-mono text-slate-500 block mb-1">Min Y:</label>
             <input
               type="number"
               placeholder="0"
@@ -171,11 +171,11 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
                   minY: e.target.value ? Number(e.target.value) : undefined,
                 }))
               }
-              className="w-full bg-[#0e1626] border border-[#1f324d] rounded px-2 py-1 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-400"
+              className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-500"
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase font-mono text-slate-400 block mb-1">Max Y:</label>
+            <label className="text-[11px] uppercase font-mono text-slate-500 block mb-1">Max Y:</label>
             <input
               type="number"
               placeholder="60"
@@ -186,20 +186,20 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
                   maxY: e.target.value ? Number(e.target.value) : undefined,
                 }))
               }
-              className="w-full bg-[#0e1626] border border-[#1f324d] rounded px-2 py-1 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-400"
+              className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-500"
             />
           </div>
         </div>
       )}
 
       {/* Record Counter */}
-      <div className="flex justify-between items-center text-[11px] text-slate-400 pt-1 border-t border-[#1f324d]/60 font-mono">
+      <div className="flex justify-between items-center text-xs text-slate-500 pt-1 border-t border-slate-100 font-mono">
         <span>
-          SHOWING: <strong className="text-cyan-300">{filteredCount}</strong> OF{' '}
-          <strong className="text-slate-200">{totalRecords}</strong> SURVEY RECORDS
+          Showing <strong className="text-slate-900">{filteredCount}</strong> of{' '}
+          <strong className="text-slate-900">{totalRecords}</strong> survey records
         </span>
         {filteredCount < totalRecords && (
-          <span className="text-amber-400">Filters Active</span>
+          <span className="text-amber-700 font-sans font-medium text-xs">Filters Active</span>
         )}
       </div>
     </div>

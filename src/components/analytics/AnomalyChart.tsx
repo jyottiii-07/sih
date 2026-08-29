@@ -21,17 +21,17 @@ export const AnomalyChart: React.FC<AnomalyChartProps> = ({ readings }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="p-3 bg-[#0a101b]/95 border border-[#2e4d75] rounded-xl shadow-2xl backdrop-blur-md text-xs font-mono">
-          <div className="text-slate-400 pb-1 border-b border-[#1f324d] mb-1.5 flex justify-between gap-3">
+        <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-lg text-xs font-mono text-slate-900">
+          <div className="text-slate-500 pb-1 border-b border-slate-100 mb-1.5 flex justify-between gap-3">
             <span>#{data.index} &bull; {data.time}</span>
-            <span className="text-cyan-300">{data.coords}</span>
+            <span className="text-blue-600 font-semibold">{data.coords}</span>
           </div>
-          <div className="flex justify-between gap-4 text-red-400">
+          <div className="flex justify-between gap-4 text-rose-700">
             <span>ML Anomaly Score:</span>
             <span className="font-bold">{data.score.toFixed(2)} / 1.00</span>
           </div>
-          <div className="text-[10px] text-slate-400 mt-1 capitalize">
-            Classification: <span className="text-cyan-300 font-semibold">{data.classification.replace('_', ' ')}</span>
+          <div className="text-xs text-slate-600 mt-1 capitalize">
+            Classification: <span className="text-slate-900 font-semibold">{data.classification.replace('_', ' ')}</span>
           </div>
         </div>
       );
@@ -42,7 +42,7 @@ export const AnomalyChart: React.FC<AnomalyChartProps> = ({ readings }) => {
   return (
     <Card
       title="ML Anomaly Likelihood Profile (0.0 to 1.0)"
-      icon={<Sparkles className="w-4 h-4 text-cyan-400" />}
+      icon={<Sparkles className="w-4 h-4 text-slate-500" />}
       subtitle="Upstream machine learning model anomaly likelihood score trajectory"
     >
       <div className="h-72 w-full">
@@ -50,37 +50,37 @@ export const AnomalyChart: React.FC<AnomalyChartProps> = ({ readings }) => {
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="anomalyGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.45} />
-                <stop offset="95%" stopColor="#ef4444" stopOpacity={0.0} />
+                <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0} />
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" vertical={false} />
+            <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
             <XAxis
               dataKey="index"
               stroke="#64748b"
-              fontSize={10}
+              fontSize={11}
               tickLine={false}
-              axisLine={{ stroke: '#1f324d' }}
+              axisLine={{ stroke: '#cbd5e1' }}
             />
             <YAxis
               stroke="#64748b"
-              fontSize={10}
+              fontSize={11}
               tickLine={false}
-              axisLine={{ stroke: '#1f324d' }}
+              axisLine={{ stroke: '#cbd5e1' }}
               domain={[0, 1.0]}
               ticks={[0, 0.25, 0.5, 0.75, 1.0]}
             />
             <Tooltip content={<CustomTooltip />} />
 
             {/* Threshold Reference Lines */}
-            <ReferenceLine y={0.8} stroke="#ef4444" strokeDasharray="4 4" label={{ value: 'Strong Zone', fill: '#ef4444', fontSize: 10 }} />
-            <ReferenceLine y={0.45} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: 'Weak Zone', fill: '#f59e0b', fontSize: 10 }} />
+            <ReferenceLine y={0.8} stroke="#e11d48" strokeDasharray="4 4" label={{ value: 'Strong Zone', fill: '#be123c', fontSize: 11 }} />
+            <ReferenceLine y={0.45} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: 'Weak Zone', fill: '#b45309', fontSize: 11 }} />
 
             <Area
               type="monotone"
               dataKey="score"
               name="Anomaly Score"
-              stroke="#ef4444"
+              stroke="#e11d48"
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#anomalyGradient)"

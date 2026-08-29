@@ -23,22 +23,22 @@ export const VectorChart: React.FC<VectorChartProps> = ({ readings }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="p-3 bg-[#0a101b]/95 border border-[#2e4d75] rounded-xl shadow-2xl backdrop-blur-md text-xs font-mono">
-          <div className="text-slate-400 pb-1 border-b border-[#1f324d] mb-1.5 flex justify-between gap-3">
+        <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-lg text-xs font-mono text-slate-900">
+          <div className="text-slate-500 pb-1 border-b border-slate-100 mb-1.5 flex justify-between gap-3">
             <span>#{data.index} &bull; {data.time}</span>
-            <span className="text-cyan-300">{data.coords}</span>
+            <span className="text-blue-600 font-semibold">{data.coords}</span>
           </div>
           <div className="space-y-1">
-            <div className="flex justify-between gap-4 text-sky-400">
-              <span>Bx Vector:</span>
+            <div className="flex justify-between gap-4 text-sky-700">
+              <span>Bx:</span>
               <span className="font-bold">{data.bx.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between gap-4 text-indigo-400">
-              <span>By Vector:</span>
+            <div className="flex justify-between gap-4 text-indigo-700">
+              <span>By:</span>
               <span className="font-bold">{data.by.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between gap-4 text-purple-400">
-              <span>Bz Vector:</span>
+            <div className="flex justify-between gap-4 text-purple-700">
+              <span>Bz:</span>
               <span className="font-bold">{data.bz.toFixed(2)}</span>
             </div>
           </div>
@@ -51,57 +51,57 @@ export const VectorChart: React.FC<VectorChartProps> = ({ readings }) => {
   return (
     <Card
       title="Magnetic Vector Components (Bx, By, Bz)"
-      icon={<Activity className="w-4 h-4 text-cyan-400" />}
+      icon={<Activity className="w-4 h-4 text-slate-500" />}
       subtitle="Raw tri-axial magnetic sensor telemetry &bull; Provisional Survey Units"
     >
       <div className="h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" vertical={false} />
+            <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
             <XAxis
               dataKey="index"
               stroke="#64748b"
-              fontSize={10}
+              fontSize={11}
               tickLine={false}
-              axisLine={{ stroke: '#1f324d' }}
+              axisLine={{ stroke: '#cbd5e1' }}
             />
             <YAxis
               stroke="#64748b"
-              fontSize={10}
+              fontSize={11}
               tickLine={false}
-              axisLine={{ stroke: '#1f324d' }}
+              axisLine={{ stroke: '#cbd5e1' }}
               domain={['auto', 'auto']}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend
-              wrapperStyle={{ paddingTop: '10px', fontSize: '11px', fontFamily: 'JetBrains Mono' }}
+              wrapperStyle={{ paddingTop: '10px', fontSize: '12px', fontFamily: 'Inter, sans-serif' }}
             />
             <Line
               type="monotone"
               dataKey="bx"
               name="Bx Vector"
-              stroke="#38bdf8"
-              strokeWidth={1.8}
+              stroke="#0284c7"
+              strokeWidth={1.75}
               dot={false}
-              activeDot={{ r: 4, fill: '#38bdf8' }}
+              activeDot={{ r: 4, fill: '#0284c7' }}
             />
             <Line
               type="monotone"
               dataKey="by"
               name="By Vector"
-              stroke="#818cf8"
-              strokeWidth={1.8}
+              stroke="#4f46e5"
+              strokeWidth={1.75}
               dot={false}
-              activeDot={{ r: 4, fill: '#818cf8' }}
+              activeDot={{ r: 4, fill: '#4f46e5' }}
             />
             <Line
               type="monotone"
               dataKey="bz"
               name="Bz Vector"
-              stroke="#c084fc"
-              strokeWidth={1.8}
+              stroke="#9333ea"
+              strokeWidth={1.75}
               dot={false}
-              activeDot={{ r: 4, fill: '#c084fc' }}
+              activeDot={{ r: 4, fill: '#9333ea' }}
             />
           </LineChart>
         </ResponsiveContainer>

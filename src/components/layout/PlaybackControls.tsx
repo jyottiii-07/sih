@@ -18,18 +18,18 @@ export const PlaybackControls: React.FC = () => {
   } = useSensorData();
 
   if (dataSource !== 'mock') {
-    return null; // Stream controls only apply in mock simulation mode
+    return null;
   }
 
   const speeds = [1, 2, 5, 10];
 
   return (
-    <div className="flex items-center gap-1.5 sm:gap-2 bg-[#070b12]/90 border border-[#1f324d] rounded-xl px-2.5 sm:px-3 py-1.5 backdrop-blur-md">
-      <div className="hidden lg:flex items-center gap-1.5 text-xs text-slate-400 font-mono pr-2 border-r border-[#1f324d]">
-        <Activity className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-        <span>Stream Sim:</span>
-        <span className="text-slate-200 font-bold">
-          {playbackIndex} / {totalAvailable}
+    <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
+      <div className="hidden lg:flex items-center gap-1.5 text-xs text-slate-500 font-mono pr-2 border-r border-slate-200">
+        <Activity className="w-3.5 h-3.5 text-blue-600" />
+        <span>Sim:</span>
+        <span className="text-slate-900 font-semibold">
+          {playbackIndex}/{totalAvailable}
         </span>
       </div>
 
@@ -38,7 +38,7 @@ export const PlaybackControls: React.FC = () => {
           variant="secondary"
           size="sm"
           onClick={pausePlayback}
-          icon={<Pause className="w-3.5 h-3.5 text-amber-400" />}
+          icon={<Pause className="w-3.5 h-3.5 text-amber-600" />}
           title="Pause simulation"
         >
           <span className="hidden sm:inline">Pause</span>
@@ -59,7 +59,7 @@ export const PlaybackControls: React.FC = () => {
         variant="ghost"
         size="sm"
         onClick={stepPlayback}
-        icon={<StepForward className="w-3.5 h-3.5 text-slate-300" />}
+        icon={<StepForward className="w-3.5 h-3.5 text-slate-600" />}
         title="Step one packet forward"
         disabled={isPlaying || playbackIndex >= totalAvailable}
       />
@@ -68,20 +68,20 @@ export const PlaybackControls: React.FC = () => {
         variant="ghost"
         size="sm"
         onClick={resetPlayback}
-        icon={<RotateCcw className="w-3.5 h-3.5 text-slate-300" />}
+        icon={<RotateCcw className="w-3.5 h-3.5 text-slate-600" />}
         title="Reset to full dataset"
       />
 
       {/* Speed Multipliers */}
-      <div className="flex items-center bg-[#0e1626] border border-[#1f324d] rounded-lg p-0.5 ml-1">
+      <div className="flex items-center bg-slate-200/80 rounded p-0.5 ml-1">
         {speeds.map((s) => (
           <button
             key={s}
             onClick={() => setPlaybackSpeed(s)}
-            className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded transition-all ${
+            className={`text-[11px] font-mono font-medium px-1.5 py-0.5 rounded transition-colors ${
               playbackSpeed === s
-                ? 'bg-cyan-500 text-slate-950 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-white text-slate-900 shadow-xs font-bold'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             {s}x

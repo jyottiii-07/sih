@@ -15,7 +15,7 @@ export const ExportActions: React.FC<ExportActionsProps> = ({ readings }) => {
         variant="secondary"
         size="sm"
         onClick={() => exportToCSV(readings)}
-        icon={<FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />}
+        icon={<FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />}
         title="Export dataset as CSV"
       >
         Export CSV
@@ -24,7 +24,7 @@ export const ExportActions: React.FC<ExportActionsProps> = ({ readings }) => {
         variant="secondary"
         size="sm"
         onClick={() => exportToJSON(readings)}
-        icon={<FileCode className="w-3.5 h-3.5 text-cyan-400" />}
+        icon={<FileCode className="w-3.5 h-3.5 text-blue-600" />}
         title="Export dataset as JSON"
       >
         Export JSON

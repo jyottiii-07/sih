@@ -36,29 +36,29 @@ export const SurveyPage: React.FC<SurveyPageProps> = ({ onSelectReading }) => {
   return (
     <div className="space-y-6">
       {/* View Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-[#0e1626] border border-[#1f324d]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 rounded-lg bg-white border border-slate-200 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-cyan-950 border border-cyan-500/40 rounded-xl text-cyan-400">
+          <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-600">
             <Map className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-display font-bold text-lg text-slate-100">
-              Seafloor Spatial Survey Grid & Anomaly Heatmap
+            <h2 className="font-bold text-base sm:text-lg text-slate-900 tracking-tight">
+              Seafloor Spatial Survey Grid & Heatmap
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500 mt-0.5">
               Local survey coordinate visualization for identifying prospective metal deposit targets
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs font-mono">
-          <div className="px-3 py-1 bg-[#070b12] border border-[#1f324d] rounded-lg text-slate-300">
-            <span className="text-slate-500 mr-1">STRONG TARGETS:</span>
-            <span className="text-red-400 font-bold">{strongAnomalyCount}</span>
+          <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-md text-slate-700">
+            <span className="text-slate-500 mr-1">Strong Targets:</span>
+            <span className="text-rose-700 font-bold">{strongAnomalyCount}</span>
           </div>
-          <div className="px-3 py-1 bg-[#070b12] border border-[#1f324d] rounded-lg text-slate-300">
-            <span className="text-slate-500 mr-1">PEAK SIGNAL:</span>
-            <span className="text-cyan-300 font-bold">{peakMagneticSignal}</span>
+          <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-md text-slate-700">
+            <span className="text-slate-500 mr-1">Peak Signal:</span>
+            <span className="text-blue-700 font-bold">{peakMagneticSignal}</span>
           </div>
         </div>
       </div>

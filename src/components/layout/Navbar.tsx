@@ -30,25 +30,25 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-[#070b12]/95 backdrop-blur-md border-b border-[#1f324d] px-3 sm:px-6 py-2.5">
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 sm:px-6 py-3">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Brand & Mission Identifier */}
         <div className="flex items-center justify-between w-full md:w-auto gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-cyan-600 to-blue-700 rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.35)] text-slate-950">
-              <Compass className="w-5 h-5 text-white animate-spin" style={{ animationDuration: '24s' }} />
+            <div className="p-2 bg-blue-50 border border-blue-200 rounded-lg text-blue-600 shadow-xs">
+              <Compass className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display font-extrabold text-sm sm:text-base text-slate-100 tracking-wider">
+                <span className="font-bold text-sm sm:text-base text-slate-900 tracking-tight">
                   NCPOR / MoES
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#152238] text-cyan-400 border border-cyan-500/30">
+                <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 font-medium">
                   ID: 26064
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-sans tracking-tight">
-                Seafloor Metal Detection Sensor Mission Control
+              <p className="text-xs text-slate-500">
+                Seafloor Metal Detection Sensor Dashboard
               </p>
             </div>
           </div>
@@ -59,17 +59,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="flex items-center bg-[#0e1626] p-1 rounded-xl border border-[#1f324d] overflow-x-auto max-w-full">
+        <nav className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 overflow-x-auto max-w-full">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-150 whitespace-nowrap ${
+                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all duration-150 whitespace-nowrap ${
                   isActive
-                    ? 'bg-cyan-500 text-slate-950 font-semibold shadow-[0_0_12px_rgba(6,182,212,0.3)]'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-[#152238]'
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
                 }`}
               >
                 {item.icon}
@@ -88,10 +88,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
           <PlaybackControls />
 
           {/* Active Sensor Tag */}
-          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0e1626] border border-[#1f324d] text-xs font-mono text-slate-300">
-            <Radio className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="text-slate-400">NODE:</span>
-            <span className="font-bold text-cyan-300">{activeSensorId}</span>
+          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-xs font-mono text-slate-700">
+            <Radio className="w-3.5 h-3.5 text-slate-500" />
+            <span className="text-slate-500">Node:</span>
+            <span className="font-semibold text-slate-900">{activeSensorId}</span>
           </div>
         </div>
       </div>

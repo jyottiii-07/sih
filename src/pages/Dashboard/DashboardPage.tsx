@@ -41,7 +41,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ setActiveTab }) =>
   } = useTelemetryStats();
 
   if (status === 'loading' && readings.length === 0) {
-    return <LoadingView message="Initializing Seafloor Sensor Telemetry Stream..." />;
+    return <LoadingView message="Initializing sensor telemetry stream..." />;
   }
 
   if (status === 'error' && readings.length === 0) {
@@ -60,34 +60,34 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ setActiveTab }) =>
   return (
     <div className="space-y-6">
       {/* Top Banner / Mission Status */}
-      <div className="p-4 rounded-xl bg-gradient-to-r from-[#0e1626] via-[#111c30] to-[#0e1626] border border-[#1f324d] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="p-4 sm:p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-cyan-950/80 border border-cyan-500/40 rounded-xl text-cyan-400">
-            <Radio className="w-5 h-5 animate-pulse" />
+          <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-600">
+            <Radio className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-display font-bold text-lg text-slate-100 tracking-wide">
+              <h2 className="font-bold text-base sm:text-lg text-slate-900 tracking-tight">
                 Seafloor Mission Overview
               </h2>
-              <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">
-                ACTIVE
+              <span className="text-xs font-mono font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                ONLINE
               </span>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500 mt-0.5">
               Low-Cost Deployable Ocean-Bottom Metal Detection Sensor (NCPOR Problem 26064)
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 text-xs font-mono text-slate-300">
-          <div className="bg-[#070b12] px-3 py-1.5 rounded-lg border border-[#1f324d]">
-            <span className="text-slate-400 mr-1.5">SENSOR:</span>
-            <span className="font-bold text-cyan-300">{activeSensorId}</span>
+        <div className="flex items-center gap-2.5 text-xs font-mono text-slate-600">
+          <div className="bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
+            <span className="text-slate-500 mr-1.5">Sensor:</span>
+            <span className="font-semibold text-slate-900">{activeSensorId}</span>
           </div>
-          <div className="bg-[#070b12] px-3 py-1.5 rounded-lg border border-[#1f324d]">
-            <span className="text-slate-400 mr-1.5">STREAM:</span>
-            <span className="font-bold text-emerald-400">ONLINE</span>
+          <div className="bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
+            <span className="text-slate-500 mr-1.5">Status:</span>
+            <span className="font-semibold text-emerald-600">Active</span>
           </div>
         </div>
       </div>
@@ -98,25 +98,24 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ setActiveTab }) =>
         <MetricCard
           label="Total Survey Readings"
           value={totalReadings}
-          icon={<Layers className="w-4 h-4" />}
-          description="Packets in survey memory"
+          icon={<Layers className="w-4 h-4 text-slate-600" />}
+          description="Packets in memory"
         />
 
         {/* Strong Anomalies */}
         <MetricCard
           label="Strong Anomalies"
           value={strongAnomalyCount}
-          icon={<Flame className="w-4 h-4 text-red-400 animate-pulse" />}
-          variant="danger"
-          description="High ferrous seabed targets"
+          icon={<Flame className="w-4 h-4 text-rose-600" />}
+          description="High ferrous targets"
         />
 
         {/* Weak Anomalies */}
         <MetricCard
           label="Weak Anomalies"
           value={weakAnomalyCount}
-          icon={<AlertTriangle className="w-4 h-4 text-amber-400" />}
-          description="Fringe / boundary zones"
+          icon={<AlertTriangle className="w-4 h-4 text-amber-600" />}
+          description="Boundary zones"
         />
 
         {/* Peak Magnetic Signal */}
@@ -124,8 +123,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ setActiveTab }) =>
           label="Peak Mag Signal"
           value={peakMagneticSignal}
           unit="survey units"
-          icon={<Zap className="w-4 h-4 text-cyan-400" />}
-          variant="cyan"
+          icon={<Zap className="w-4 h-4 text-blue-600" />}
           description="Maximum field magnitude"
         />
 
@@ -134,8 +132,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ setActiveTab }) =>
           label="Latest ML Score"
           value={latestAnomalyScore}
           unit="/ 1.00"
-          icon={<Sparkles className="w-4 h-4 text-cyan-400" />}
-          description="Current packet ML likelihood"
+          icon={<Sparkles className="w-4 h-4 text-slate-600" />}
+          description="Current packet ML score"
         />
       </div>
 
