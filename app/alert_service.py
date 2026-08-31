@@ -1,32 +1,31 @@
-from app.config import METAL_ALERT_THRESHOLD
-from app.database import alerts_collection
+from app.database import insert_alert
 from app.ws_manager import manager
 
 
 async def evaluate_reading(reading_doc: dict):
     """
-    Checks a newly-saved reading against the alert threshold. If it crosses
-    the line, creates an alert document and broadcasts it to any connected
-    frontend dashboards over the WebSocket.
-
-    Called by mqtt_client.py right after a reading is inserted into MongoDB.
-    Returns the alert dict if one was created, otherwise None.
+    Checks a newly processed reading against anomaly alert criteria.
+    If anomaly_score >= 0.70 or classification == 'strong_anomaly', triggers
+    a high-priority alert and broadcasts over WebSockets.
     """
-    signature = reading_doc.get("metal_signature")
-    if signature is None or signature < METAL_ALERT_THRESHOLD:
+    score = float(reading_doc.get("anomaly_score", 0.0))
+    classification = str(reading_doc.get("classification", "normal"))
+    mag = float(reading_doc.get("magnetic_signal", 0.0))
+
+    if score < 0.70 and classification != "strong_anomaly":
         return None
 
     alert = {
-        "device_id": reading_doc.get("device_id"),
-        "timestamp": reading_doc.get("timestamp"),
-        "metal_signature": signature,
-        "metal_type": reading_doc.get("metal_type"),
-        "location": reading_doc.get("location"),
-        "message": f"High metal signature ({signature}) detected by {reading_doc.get('device_id')}",
+        "sensor_id": str(reading_doc.get("sensor_id", "SFS-001")),
+        "timestamp": str(reading_doc.get("timestamp", "")),
+        "x": float(reading_doc.get("x", 0.0)),
+        "y": float(reading_doc.get("y", 0.0)),
+        "magnetic_signal": mag,
+        "anomaly_score": score,
+        "classification": classification,
+        "message": f"Strong magnetic anomaly (Score: {score:.2f}, Signal: {mag:.2f}) detected at Grid ({reading_doc.get('x')}, {reading_doc.get('y')})",
     }
 
-    result = await alerts_collection.insert_one(alert)
-    alert["_id"] = str(result.inserted_id)
-
-    await manager.broadcast({"event": "alert", "data": alert})
-    return alert
+    saved_alert = await insert_alert(alert)
+    await manager.broadcast("alert", saved_alert)
+    return saved_alert

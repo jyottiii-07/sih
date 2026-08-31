@@ -1,22 +1,104 @@
-import httpx
-from app.config import ML_SERVICE_URL
+import math
+import numpy as np
+import pandas as pd
+from typing import Dict, Any, Optional
+
+# Lazy loading of ML pipeline
+_pipeline = None
 
 
-async def classify_reading(payload: dict) -> dict:
+def get_ml_pipeline():
+    """Initializes and returns the singleton SeafloorAnomalyPipeline instance."""
+    global _pipeline
+    if _pipeline is None:
+        try:
+            from src.pipeline import SeafloorAnomalyPipeline
+            _pipeline = SeafloorAnomalyPipeline().load("models")
+            print("[ML Engine] Successfully loaded IsolationForest & ScoreNormalizer from models/")
+        except Exception as e:
+            print(f"[ML Engine] Notice: Could not load joblib models ({e}). Using robust analytical baseline.")
+            _pipeline = False
+    return _pipeline
+
+
+async def classify_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Sends a raw sensor reading to the AI/ML teammate's service and returns
-    the predicted metal type + confidence.
-
-    Agree with your ML teammate on a contract like:
-      Request:  POST {"metal_signature": 68.2, "depth_m": 42.5, ...}
-      Response: {"metal_type": "iron_ore", "confidence": 0.87}
-
-    Falls back gracefully if the ML service is down or not built yet.
+    Performs ML inference on raw magnetometer reading.
+    Extracts 3D magnetic field magnitude and computes anomaly score & classification.
+    
+    Supports both:
+    1. Normalized survey units (baseline ~0.45) via trained IsolationForest model
+    2. Physical microTesla / engineering units (geomagnetic background ~45.0 uT)
+    
+    Returns:
+        {
+            "magnetic_signal": float,
+            "anomaly_score": float,
+            "classification": "normal" | "weak_anomaly" | "strong_anomaly"
+        }
     """
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.post(ML_SERVICE_URL, json=payload)
-            resp.raise_for_status()
-            return resp.json()
-    except Exception as e:
-        return {"metal_type": "unknown", "confidence": 0.0, "error": str(e)}
+    bx = float(payload.get("bx", 0.0))
+    by = float(payload.get("by", 0.0))
+    bz = float(payload.get("bz", 0.0))
+    
+    # Total magnetic intensity B = sqrt(bx^2 + by^2 + bz^2)
+    mag_sig = round(math.sqrt(bx**2 + by**2 + bz**2), 4)
+
+    pipeline = get_ml_pipeline()
+    anomaly_score = 0.0
+
+    # Determine measurement scale
+    is_microtesla_scale = (mag_sig > 5.0)
+
+    if is_microtesla_scale:
+        # MicroTesla / Engineering scale (geomagnetic background around 45.0 uT)
+        bg_baseline = 45.0
+        delta_b = abs(mag_sig - bg_baseline)
+        if delta_b < 1.5:
+            # Baseline quiet background
+            anomaly_score = round(delta_b / 15.0, 4)
+        elif delta_b < 10.0:
+            # Moderate field variation / weak target
+            anomaly_score = round(0.40 + (delta_b - 1.5) / (10.0 - 1.5) * 0.28, 4)
+        else:
+            # Strong ferromagnetic anomaly
+            anomaly_score = round(min(1.0, 0.70 + (delta_b - 10.0) / 25.0 * 0.30), 4)
+    else:
+        # Survey unit scale (baseline around 0.45)
+        if pipeline and hasattr(pipeline, "is_ready") and pipeline.is_ready:
+            try:
+                df_in = pd.DataFrame([{
+                    "sensor_id": str(payload.get("sensor_id", "SFS-001")),
+                    "timestamp": str(payload.get("timestamp", "")),
+                    "x": float(payload.get("x", 0.0)),
+                    "y": float(payload.get("y", 0.0)),
+                    "bx": bx,
+                    "by": by,
+                    "bz": bz,
+                    "magnetic_signal": mag_sig,
+                }])
+                feat_df = pipeline.feature_extractor.extract_features(df_in)
+                raw_scores = pipeline.detector.get_raw_scores(feat_df)
+                norm_scores = pipeline.normalizer.normalize(raw_scores)
+                anomaly_score = float(norm_scores[0])
+            except Exception:
+                delta_b = abs(mag_sig - 0.45)
+                anomaly_score = min(1.0, round(delta_b / 0.50, 4))
+        else:
+            delta_b = abs(mag_sig - 0.45)
+            anomaly_score = min(1.0, round(delta_b / 0.50, 4))
+
+    # Strict Data-Contract 3-tier Classification Mapping
+    anomaly_score = round(max(0.0, min(1.0, anomaly_score)), 4)
+    if anomaly_score >= 0.70:
+        classification = "strong_anomaly"
+    elif anomaly_score >= 0.40:
+        classification = "weak_anomaly"
+    else:
+        classification = "normal"
+
+    return {
+        "magnetic_signal": mag_sig,
+        "anomaly_score": anomaly_score,
+        "classification": classification,
+    }

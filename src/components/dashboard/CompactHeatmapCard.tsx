@@ -13,9 +13,17 @@ export const CompactHeatmapCard: React.FC<CompactHeatmapCardProps> = ({ onOpenSu
 
   const size = 280;
   const padding = 20;
-  const mapCoord = (val: number, max: number = 60) => {
-    return padding + (val / max) * (size - padding * 2);
+  const maxCoord = React.useMemo(() => {
+    if (readings.length === 0) return 60;
+    const maxVal = Math.max(...readings.map((r) => Math.max(r.x, r.y, 0)));
+    return Math.max(60, Math.ceil(maxVal / 10) * 10);
+  }, [readings]);
+
+  const mapCoord = (val: number, max: number = maxCoord) => {
+    return padding + (val / (max || 1)) * (size - padding * 2);
   };
+
+  const gridTicks = [0, maxCoord * 0.25, maxCoord * 0.5, maxCoord * 0.75, maxCoord].map((t) => Math.round(t));
 
   return (
     <Card
@@ -33,7 +41,7 @@ export const CompactHeatmapCard: React.FC<CompactHeatmapCardProps> = ({ onOpenSu
         <div className="relative w-full max-w-[280px] aspect-square bg-slate-50 rounded-lg border border-slate-200 overflow-hidden p-1 shadow-inner">
           <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full">
             {/* Grid background lines */}
-            {[0, 15, 30, 45, 60].map((tick) => {
+            {gridTicks.map((tick) => {
               const pos = mapCoord(tick);
               return (
                 <g key={`grid-${tick}`}>

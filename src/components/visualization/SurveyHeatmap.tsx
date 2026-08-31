@@ -15,6 +15,12 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const maxCoord = React.useMemo(() => {
+    if (readings.length === 0) return 60;
+    const maxVal = Math.max(...readings.map((r) => Math.max(r.x, r.y, 0)));
+    return Math.max(60, Math.ceil(maxVal / 10) * 10);
+  }, [readings]);
+
   const {
     config,
     zoom,
@@ -32,9 +38,9 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
     viewBoxHeight: 640,
     padding: 50,
     gridMinX: 0,
-    gridMaxX: 60,
+    gridMaxX: maxCoord,
     gridMinY: 0,
-    gridMaxY: 60,
+    gridMaxY: maxCoord,
   });
 
   // Pan dragging state
@@ -85,7 +91,14 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
   }, [readings, centerOnPoint, setSelectedReading]);
 
   const { viewBoxWidth, viewBoxHeight, padding } = config;
-  const gridTicks = [0, 10, 20, 30, 40, 50, 60];
+  const gridTicks = React.useMemo(() => {
+    const step = maxCoord <= 60 ? 10 : 20;
+    const ticks: number[] = [];
+    for (let t = 0; t <= maxCoord; t += step) {
+      ticks.push(t);
+    }
+    return ticks;
+  }, [maxCoord]);
 
   // Filter plotted readings based on active layers
   const visibleReadings = readings.filter((r) => {

@@ -1,11 +1,84 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Literal
 from datetime import datetime
 
 
+# ---------------------------------------------------------------------------
+# LOCKED 10-FIELD SEAMLESS DATA CONTRACT (SIH 2026 / NCPOR 26064)
+# ---------------------------------------------------------------------------
+
+class RawSensorReadingIn(BaseModel):
+    sensor_id: Optional[str] = "SFS-001"
+    timestamp: Optional[str] = None
+    x: float
+    y: float
+    bx: float
+    by: float
+    bz: float
+
+
+class ProcessedSensorReadingOut(BaseModel):
+    sensor_id: str
+    timestamp: str
+    x: float
+    y: float
+    bx: float
+    by: float
+    bz: float
+    magnetic_signal: float
+    anomaly_score: float
+    classification: Literal["normal", "weak_anomaly", "strong_anomaly"]
+
+
+class ReadingsBatchResponse(BaseModel):
+    status: str = "success"
+    mission_id: Optional[str] = "EXP-2026-NCPOR-01"
+    count: int
+    data: List[ProcessedSensorReadingOut]
+
+
+class LatestReadingResponse(BaseModel):
+    status: str = "success"
+    data: Optional[ProcessedSensorReadingOut] = None
+
+
+class GridCellOut(BaseModel):
+    x: float
+    y: float
+    bx: float
+    by: float
+    bz: float
+    magnetic_signal: float
+    anomaly_score: float
+    classification: Literal["normal", "weak_anomaly", "strong_anomaly"]
+    readings_count: int
+    last_timestamp: str
+
+
+class GridResponse(BaseModel):
+    status: str = "success"
+    count: int
+    cells: List[GridCellOut]
+
+
+class TelemetryAlertOut(BaseModel):
+    sensor_id: str
+    timestamp: str
+    x: float
+    y: float
+    magnetic_signal: float
+    anomaly_score: float
+    classification: str
+    message: str
+
+
+# ---------------------------------------------------------------------------
+# LEGACY DRAFT SCHEMAS (Preserved for compatibility)
+# ---------------------------------------------------------------------------
+
 class GeoPoint(BaseModel):
     type: str = "Point"
-    coordinates: List[float]  # [lng, lat] -- GeoJSON order, NOT [lat, lng]
+    coordinates: List[float]
 
 
 class SensorReading(BaseModel):
@@ -20,18 +93,18 @@ class SensorReading(BaseModel):
 
 
 class ReadingOut(SensorReading):
-    id: str = Field(alias="_id")
+    id: str = Field(default="", alias="_id")
 
     class Config:
         populate_by_name = True
 
 
 class AlertOut(BaseModel):
-    id: str = Field(alias="_id")
+    id: str = Field(default="", alias="_id")
     device_id: str
     timestamp: datetime
     metal_signature: float
-    metal_type: Optional[str]
+    metal_type: Optional[str] = None
     location: GeoPoint
     message: str
 
