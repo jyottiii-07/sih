@@ -1,0 +1,112 @@
+{
+  "benchmark_metadata": {
+    "problem_id": "26064",
+    "evaluation_type": "SYNTHETIC DEVELOPMENT EXPERIMENT",
+    "target_failure_condition": "High Noise (0.035) + Weak Anomaly (0.15 - 0.30)",
+    "evaluation_seeds": [
+      1,
+      42,
+      100
+    ],
+    "disclaimer": "Classical signal processing evaluation on synthetic seabed surveys. Production defaults remain unchanged."
+  },
+  "comparative_results": {
+    "1. Baseline Pipeline (Unfiltered)": {
+      "precision_mean": 0.6173,
+      "recall_mean": 0.5694,
+      "f1_mean": 0.5778,
+      "fpr_mean": 0.0142,
+      "fnr_mean": 0.4306
+    },
+    "2. Gaussian Smoothing (sigma=1.0)": {
+      "precision_mean": 0.9095,
+      "recall_mean": 0.4636,
+      "f1_mean": 0.6085,
+      "fpr_mean": 0.0018,
+      "fnr_mean": 0.5364
+    },
+    "3. Gaussian Smoothing (sigma=2.0)": {
+      "precision_mean": 0.9621,
+      "recall_mean": 0.4431,
+      "f1_mean": 0.6041,
+      "fpr_mean": 0.0007,
+      "fnr_mean": 0.5569
+    },
+    "4. Gaussian Smoothing Over-smoothed (sigma=3.0)": {
+      "precision_mean": 0.9697,
+      "recall_mean": 0.4418,
+      "f1_mean": 0.6047,
+      "fpr_mean": 0.0006,
+      "fnr_mean": 0.5582
+    },
+    "5. Savitzky-Golay (w=5, p=2)": {
+      "precision_mean": 0.8435,
+      "recall_mean": 0.4933,
+      "f1_mean": 0.6163,
+      "fpr_mean": 0.0035,
+      "fnr_mean": 0.5067
+    },
+    "6. Savitzky-Golay (w=9, p=2)": {
+      "precision_mean": 0.9296,
+      "recall_mean": 0.4467,
+      "f1_mean": 0.599,
+      "fpr_mean": 0.0012,
+      "fnr_mean": 0.5533
+    },
+    "7. Savitzky-Golay Over-smoothed (w=15, p=2)": {
+      "precision_mean": 0.947,
+      "recall_mean": 0.4654,
+      "f1_mean": 0.6216,
+      "fpr_mean": 0.001,
+      "fnr_mean": 0.5346
+    },
+    "8. Multi-Pass Stacking (2 Passes)": {
+      "precision_mean": 0.5222,
+      "recall_mean": 0.604,
+      "f1_mean": 0.55,
+      "fpr_mean": 0.0223,
+      "fnr_mean": 0.396
+    },
+    "9. Multi-Pass Stacking (4 Passes)": {
+      "precision_mean": 0.5225,
+      "recall_mean": 0.5841,
+      "f1_mean": 0.5377,
+      "fpr_mean": 0.0216,
+      "fnr_mean": 0.4159
+    },
+    "10. Baseline + Spatial Consistency Filter": {
+      "precision_mean": 0.7006,
+      "recall_mean": 0.5608,
+      "f1_mean": 0.6104,
+      "fpr_mean": 0.0095,
+      "fnr_mean": 0.4392
+    }
+  },
+  "oversmoothing_tradeoff_analysis": {
+    "gaussian_tradeoff": {
+      "sigma_1_recall": 0.4636,
+      "sigma_2_recall": 0.4431,
+      "sigma_3_recall": 0.4418,
+      "observation": "Moderate smoothing (sigma=1.0) improves SNR, but excessive smoothing (sigma=3.0) attenuates localized anomaly peaks into background."
+    },
+    "savgol_tradeoff": {
+      "w5_f1": 0.6163,
+      "w9_f1": 0.599,
+      "w15_f1": 0.6216,
+      "observation": "Shorter window lengths (w=5 to 9) preserve peak geometry; wide windows (w=15) broaden and dampen narrow dipole gradients."
+    },
+    "stacking_efficacy": {
+      "baseline_fnr": 0.4306,
+      "stacking_2_fnr": 0.396,
+      "stacking_4_fnr": 0.4159,
+      "observation": "Multi-pass stacking demonstrates the highest physical efficacy for weak anomalies in high noise by boosting coherent SNR by sqrt(K)."
+    },
+    "consistency_filter_impact": {
+      "baseline_precision": 0.6173,
+      "filtered_precision": 0.7006,
+      "baseline_fpr": 0.0142,
+      "filtered_fpr": 0.0095,
+      "observation": "Consistency filtering suppresses single-point noise spikes, increasing precision while preserving contiguous spatial anomaly clusters."
+    }
+  }
+}

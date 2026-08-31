@@ -1,0 +1,65 @@
+{
+  "test_type": "SYNTHETIC CALIBRATION TEST",
+  "disclaimer": "Software verification only. Real hardware calibration requires physical vehicle measurements.",
+  "parameters": {
+    "num_test_points": 500,
+    "expected_field_norm": 0.45,
+    "injected_hard_iron_offset": [
+      0.08,
+      -0.05,
+      0.12
+    ],
+    "injected_soft_iron_matrix": [
+      [
+        1.25,
+        0.08,
+        0.04
+      ],
+      [
+        0.08,
+        0.85,
+        -0.06
+      ],
+      [
+        0.04,
+        -0.06,
+        1.1
+      ]
+    ]
+  },
+  "estimated_parameters": {
+    "estimated_hard_iron_offset": [
+      0.0768,
+      -0.0525,
+      0.1181
+    ],
+    "estimated_soft_iron_matrix": [
+      [
+        0.7856,
+        -0.0988,
+        -0.0411
+      ],
+      [
+        -0.0988,
+        1.219,
+        0.0786
+      ],
+      [
+        -0.0411,
+        0.0786,
+        0.9193
+      ]
+    ],
+    "hard_iron_estimation_error": 0.0045
+  },
+  "performance_metrics": {
+    "mean_l2_error_before": 0.1708,
+    "relative_error_before": 0.3797,
+    "field_norm_std_before": 0.104,
+    "mean_field_norm_error_after": 0.0072,
+    "relative_field_norm_error_after": 0.0159,
+    "field_norm_std_after": 0.0089,
+    "vector_l2_error_after": 0.0132,
+    "magnitude_recovery_percentage": 98.41
+  }
+}

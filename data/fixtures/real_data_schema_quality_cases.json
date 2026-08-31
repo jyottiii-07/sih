@@ -1,0 +1,151 @@
+{
+  "_metadata": {
+    "fixture_type": "REAL-DATA SCHEMA FIXTURE - QUALITY TEST CASES",
+    "disclaimer": "SYNTHETIC FIXTURE FOR TESTING TELEMETRY VALIDATION ENGINE ONLY"
+  },
+  "duplicate_timestamp_case": [
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:00",
+      "x": 5.0,
+      "y": 5.0,
+      "bx": 0.1845,
+      "by": 0.1725,
+      "bz": 0.3488
+    },
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:00",
+      "x": 5.2,
+      "y": 5.0,
+      "bx": 0.1847,
+      "by": 0.1727,
+      "bz": 0.3490
+    }
+  ],
+  "irregular_sampling_case": [
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:00",
+      "x": 5.0,
+      "y": 5.0,
+      "bx": 0.1845,
+      "by": 0.1725,
+      "bz": 0.3488
+    },
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:07",
+      "x": 6.0,
+      "y": 5.0,
+      "bx": 0.1850,
+      "by": 0.1730,
+      "bz": 0.3490
+    }
+  ],
+  "sensor_dropout_flatline_case": [
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:00",
+      "x": 5.0,
+      "y": 5.0,
+      "bx": 0.1845,
+      "by": 0.1725,
+      "bz": 0.3488
+    },
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:01",
+      "x": 6.0,
+      "y": 5.0,
+      "bx": 0.1845,
+      "by": 0.1725,
+      "bz": 0.3488
+    },
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:02",
+      "x": 7.0,
+      "y": 5.0,
+      "bx": 0.1845,
+      "by": 0.1725,
+      "bz": 0.3488
+    },
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:03",
+      "x": 8.0,
+      "y": 5.0,
+      "bx": 0.1845,
+      "by": 0.1725,
+      "bz": 0.3488
+    },
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:04",
+      "x": 9.0,
+      "y": 5.0,
+      "bx": 0.1845,
+      "by": 0.1725,
+      "bz": 0.3488
+    },
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:05",
+      "x": 10.0,
+      "y": 5.0,
+      "bx": 0.1845,
+      "by": 0.1725,
+      "bz": 0.3488
+    }
+  ],
+  "magnetic_spike_case": [
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:00",
+      "x": 5.0,
+      "y": 5.0,
+      "bx": 0.1845,
+      "by": 0.1725,
+      "bz": 0.3488
+    },
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:01",
+      "x": 6.0,
+      "y": 5.0,
+      "bx": 8.5000,
+      "by": 9.2000,
+      "bz": 12.4000
+    },
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:02",
+      "x": 7.0,
+      "y": 5.0,
+      "bx": 0.1847,
+      "by": 0.1726,
+      "bz": 0.3489
+    }
+  ],
+  "coordinate_jump_case": [
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:00",
+      "x": 5.0,
+      "y": 5.0,
+      "bx": 0.1845,
+      "by": 0.1725,
+      "bz": 0.3488
+    },
+    {
+      "sensor_id": "SFS-001",
+      "timestamp": "2026-08-27T10:00:01",
+      "x": 150.0,
+      "y": 5.0,
+      "bx": 0.1848,
+      "by": 0.1729,
+      "bz": 0.3491
+    }
+  ]
+}

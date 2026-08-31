@@ -1,0 +1,534 @@
+{
+  "suite_metadata": {
+    "problem_id": "26064",
+    "evaluation_type": "SYNTHETIC DEVELOPMENT EVALUATION",
+    "execution_time_seconds": 67.03,
+    "disclaimer": "All findings represent synthetic development benchmarking. Re-calibration on ocean sensor data is mandatory."
+  },
+  "multi_seed_evaluation": {
+    "individual_runs": [
+      {
+        "seed": 1,
+        "precision": 0.9608,
+        "recall": 0.7368,
+        "f1_score": 0.834,
+        "fpr": 0.0017,
+        "fnr": 0.2632,
+        "tp": 98,
+        "fp": 4,
+        "tn": 2363,
+        "fn": 35
+      },
+      {
+        "seed": 10,
+        "precision": 0.8667,
+        "recall": 0.9455,
+        "f1_score": 0.9043,
+        "fpr": 0.0067,
+        "fnr": 0.0545,
+        "tp": 104,
+        "fp": 16,
+        "tn": 2374,
+        "fn": 6
+      },
+      {
+        "seed": 42,
+        "precision": 0.9326,
+        "recall": 0.9022,
+        "f1_score": 0.9171,
+        "fpr": 0.0025,
+        "fnr": 0.0978,
+        "tp": 83,
+        "fp": 6,
+        "tn": 2402,
+        "fn": 9
+      },
+      {
+        "seed": 100,
+        "precision": 0.8769,
+        "recall": 0.8382,
+        "f1_score": 0.8571,
+        "fpr": 0.0033,
+        "fnr": 0.1618,
+        "tp": 57,
+        "fp": 8,
+        "tn": 2424,
+        "fn": 11
+      },
+      {
+        "seed": 999,
+        "precision": 0.9352,
+        "recall": 0.7891,
+        "f1_score": 0.8559,
+        "fpr": 0.003,
+        "fnr": 0.2109,
+        "tp": 101,
+        "fp": 7,
+        "tn": 2365,
+        "fn": 27
+      }
+    ],
+    "aggregated_stats": {
+      "precision": {
+        "mean": 0.9144,
+        "std": 0.0363,
+        "min": 0.8667,
+        "max": 0.9608
+      },
+      "recall": {
+        "mean": 0.8424,
+        "std": 0.0751,
+        "min": 0.7368,
+        "max": 0.9455
+      },
+      "f1_score": {
+        "mean": 0.8737,
+        "std": 0.0316,
+        "min": 0.834,
+        "max": 0.9171
+      },
+      "fpr": {
+        "mean": 0.0034,
+        "std": 0.0017,
+        "min": 0.0017,
+        "max": 0.0067
+      },
+      "fnr": {
+        "mean": 0.1576,
+        "std": 0.0751,
+        "min": 0.0545,
+        "max": 0.2632
+      }
+    }
+  },
+  "noise_robustness": {
+    "Low Noise (0.005)": {
+      "noise_std": 0.005,
+      "precision_mean": 0.8509,
+      "recall_mean": 0.8884,
+      "f1_mean": 0.8648,
+      "fpr_mean": 0.0068,
+      "fnr_mean": 0.1116
+    },
+    "Medium Noise (0.015)": {
+      "noise_std": 0.015,
+      "precision_mean": 0.9144,
+      "recall_mean": 0.8424,
+      "f1_mean": 0.8737,
+      "fpr_mean": 0.0034,
+      "fnr_mean": 0.1576
+    },
+    "High Noise (0.035)": {
+      "noise_std": 0.035,
+      "precision_mean": 0.9036,
+      "recall_mean": 0.7438,
+      "f1_mean": 0.8145,
+      "fpr_mean": 0.0033,
+      "fnr_mean": 0.2562
+    },
+    "Very High Noise (0.060)": {
+      "noise_std": 0.06,
+      "precision_mean": 0.8968,
+      "recall_mean": 0.7017,
+      "f1_mean": 0.7851,
+      "fpr_mean": 0.0038,
+      "fnr_mean": 0.2983
+    }
+  },
+  "anomaly_strength_analysis": {
+    "Very Weak (0.05-0.15)": {
+      "strength_range": [
+        0.05,
+        0.15
+      ],
+      "high_anomaly_mean_score": 0.5897,
+      "high_anomaly_median_score": 0.612,
+      "background_mean_score": 0.2259,
+      "detection_rate (Recall)": 0.457,
+      "precision": 0.372,
+      "f1_score": 0.4017,
+      "fpr": 0.0353
+    },
+    "Weak (0.15-0.30)": {
+      "strength_range": [
+        0.15,
+        0.3
+      ],
+      "high_anomaly_mean_score": 0.7465,
+      "high_anomaly_median_score": 0.7724,
+      "background_mean_score": 0.1731,
+      "detection_rate (Recall)": 0.6508,
+      "precision": 0.7495,
+      "f1_score": 0.6919,
+      "fpr": 0.01
+    },
+    "Medium (0.30-0.60)": {
+      "strength_range": [
+        0.3,
+        0.6
+      ],
+      "high_anomaly_mean_score": 0.8205,
+      "high_anomaly_median_score": 0.8444,
+      "background_mean_score": 0.1389,
+      "detection_rate (Recall)": 0.8303,
+      "precision": 0.8728,
+      "f1_score": 0.8464,
+      "fpr": 0.0057
+    },
+    "Strong (0.60-1.00)": {
+      "strength_range": [
+        0.6,
+        1.0
+      ],
+      "high_anomaly_mean_score": 0.8515,
+      "high_anomaly_median_score": 0.865,
+      "background_mean_score": 0.1212,
+      "detection_rate (Recall)": 0.9094,
+      "precision": 0.9186,
+      "f1_score": 0.9105,
+      "fpr": 0.0038
+    },
+    "Very Strong (1.00-2.00)": {
+      "strength_range": [
+        1.0,
+        2.0
+      ],
+      "high_anomaly_mean_score": 0.8688,
+      "high_anomaly_median_score": 0.8801,
+      "background_mean_score": 0.1067,
+      "detection_rate (Recall)": 0.9488,
+      "precision": 0.9004,
+      "f1_score": 0.9213,
+      "fpr": 0.005
+    }
+  },
+  "threshold_sensitivity": {
+    "threshold_table": {
+      "0.30": {
+        "threshold": 0.3,
+        "precision": 0.3883,
+        "recall": 1.0,
+        "f1_score": 0.5578,
+        "fpr": 0.0684,
+        "fnr": 0.0,
+        "tp": 106.2,
+        "fp": 163.6,
+        "tn": 2230.2,
+        "fn": 0.0
+      },
+      "0.35": {
+        "threshold": 0.35,
+        "precision": 0.4866,
+        "recall": 0.9955,
+        "f1_score": 0.6528,
+        "fpr": 0.0456,
+        "fnr": 0.0045,
+        "tp": 105.8,
+        "fp": 109.0,
+        "tn": 2284.8,
+        "fn": 0.4
+      },
+      "0.40": {
+        "threshold": 0.4,
+        "precision": 0.5716,
+        "recall": 0.9866,
+        "f1_score": 0.7222,
+        "fpr": 0.032,
+        "fnr": 0.0134,
+        "tp": 105.0,
+        "fp": 76.6,
+        "tn": 2317.2,
+        "fn": 1.2
+      },
+      "0.45": {
+        "threshold": 0.45,
+        "precision": 0.6486,
+        "recall": 0.9676,
+        "f1_score": 0.7751,
+        "fpr": 0.0226,
+        "fnr": 0.0324,
+        "tp": 103.0,
+        "fp": 54.0,
+        "tn": 2339.8,
+        "fn": 3.2
+      },
+      "0.50": {
+        "threshold": 0.5,
+        "precision": 0.7284,
+        "recall": 0.9578,
+        "f1_score": 0.8256,
+        "fpr": 0.0155,
+        "fnr": 0.0422,
+        "tp": 101.8,
+        "fp": 37.0,
+        "tn": 2356.8,
+        "fn": 4.4
+      },
+      "0.55": {
+        "threshold": 0.55,
+        "precision": 0.8078,
+        "recall": 0.93,
+        "f1_score": 0.8618,
+        "fpr": 0.0095,
+        "fnr": 0.07,
+        "tp": 98.6,
+        "fp": 22.8,
+        "tn": 2371.0,
+        "fn": 7.6
+      },
+      "0.60": {
+        "threshold": 0.6,
+        "precision": 0.8699,
+        "recall": 0.893,
+        "f1_score": 0.8781,
+        "fpr": 0.0058,
+        "fnr": 0.107,
+        "tp": 94.2,
+        "fp": 13.8,
+        "tn": 2380.0,
+        "fn": 12.0
+      },
+      "0.65": {
+        "threshold": 0.65,
+        "precision": 0.9144,
+        "recall": 0.8424,
+        "f1_score": 0.8737,
+        "fpr": 0.0034,
+        "fnr": 0.1576,
+        "tp": 88.6,
+        "fp": 8.2,
+        "tn": 2385.6,
+        "fn": 17.6
+      },
+      "0.70": {
+        "threshold": 0.7,
+        "precision": 0.946,
+        "recall": 0.761,
+        "f1_score": 0.8416,
+        "fpr": 0.0018,
+        "fnr": 0.239,
+        "tp": 80.0,
+        "fp": 4.4,
+        "tn": 2389.4,
+        "fn": 26.2
+      },
+      "0.75": {
+        "threshold": 0.75,
+        "precision": 0.9685,
+        "recall": 0.6791,
+        "f1_score": 0.7952,
+        "fpr": 0.0009,
+        "fnr": 0.3209,
+        "tp": 71.2,
+        "fp": 2.2,
+        "tn": 2391.6,
+        "fn": 35.0
+      },
+      "0.80": {
+        "threshold": 0.8,
+        "precision": 0.9972,
+        "recall": 0.6095,
+        "f1_score": 0.7532,
+        "fpr": 0.0001,
+        "fnr": 0.3905,
+        "tp": 63.6,
+        "fp": 0.2,
+        "tn": 2393.6,
+        "fn": 42.6
+      }
+    },
+    "analysis": {
+      "best_f1_threshold": 0.6,
+      "best_f1_value": 0.8781,
+      "max_recall_threshold": 0.3,
+      "max_recall_value": 1.0,
+      "min_fpr_threshold": 0.8,
+      "min_fpr_value": 0.0001,
+      "baseline_threshold_0_65_f1": 0.8737
+    }
+  },
+  "cross_condition_failure_cases": {
+    "matrix": [
+      {
+        "noise_std": 0.005,
+        "anomaly_strength": "Very Weak",
+        "strength_range": "0.05-0.15",
+        "recall": 0.3939,
+        "precision": 0.4315,
+        "f1_score": 0.4063,
+        "fpr": 0.0204,
+        "fnr": 0.6061,
+        "operational_status": "HIGH_FALSE_NEGATIVES (Weak Anomaly Submerged by Noise)"
+      },
+      {
+        "noise_std": 0.005,
+        "anomaly_strength": "Weak",
+        "strength_range": "0.15-0.3",
+        "recall": 0.6801,
+        "precision": 0.7203,
+        "f1_score": 0.697,
+        "fpr": 0.0101,
+        "fnr": 0.3199,
+        "operational_status": "HIGH_FALSE_NEGATIVES (Weak Anomaly Submerged by Noise)"
+      },
+      {
+        "noise_std": 0.005,
+        "anomaly_strength": "Medium",
+        "strength_range": "0.3-0.6",
+        "recall": 0.7933,
+        "precision": 0.8223,
+        "f1_score": 0.8001,
+        "fpr": 0.0065,
+        "fnr": 0.2067,
+        "operational_status": "STABLE"
+      },
+      {
+        "noise_std": 0.005,
+        "anomaly_strength": "Strong",
+        "strength_range": "0.6-1.2",
+        "recall": 0.9293,
+        "precision": 0.8307,
+        "f1_score": 0.8741,
+        "fpr": 0.007,
+        "fnr": 0.0707,
+        "operational_status": "STABLE"
+      },
+      {
+        "noise_std": 0.015,
+        "anomaly_strength": "Very Weak",
+        "strength_range": "0.05-0.15",
+        "recall": 0.384,
+        "precision": 0.3325,
+        "f1_score": 0.3496,
+        "fpr": 0.0309,
+        "fnr": 0.616,
+        "operational_status": "HIGH_FALSE_NEGATIVES (Weak Anomaly Submerged by Noise)"
+      },
+      {
+        "noise_std": 0.015,
+        "anomaly_strength": "Weak",
+        "strength_range": "0.15-0.3",
+        "recall": 0.6014,
+        "precision": 0.7419,
+        "f1_score": 0.661,
+        "fpr": 0.0083,
+        "fnr": 0.3986,
+        "operational_status": "HIGH_FALSE_NEGATIVES (Weak Anomaly Submerged by Noise)"
+      },
+      {
+        "noise_std": 0.015,
+        "anomaly_strength": "Medium",
+        "strength_range": "0.3-0.6",
+        "recall": 0.7826,
+        "precision": 0.8656,
+        "f1_score": 0.8186,
+        "fpr": 0.0044,
+        "fnr": 0.2174,
+        "operational_status": "STABLE"
+      },
+      {
+        "noise_std": 0.015,
+        "anomaly_strength": "Strong",
+        "strength_range": "0.6-1.2",
+        "recall": 0.9001,
+        "precision": 0.9316,
+        "f1_score": 0.915,
+        "fpr": 0.0024,
+        "fnr": 0.0999,
+        "operational_status": "STABLE"
+      },
+      {
+        "noise_std": 0.035,
+        "anomaly_strength": "Very Weak",
+        "strength_range": "0.05-0.15",
+        "recall": 0.406,
+        "precision": 0.2295,
+        "f1_score": 0.2776,
+        "fpr": 0.0559,
+        "fnr": 0.594,
+        "operational_status": "HIGH_FALSE_NEGATIVES (Weak Anomaly Submerged by Noise)"
+      },
+      {
+        "noise_std": 0.035,
+        "anomaly_strength": "Weak",
+        "strength_range": "0.15-0.3",
+        "recall": 0.5694,
+        "precision": 0.6173,
+        "f1_score": 0.5778,
+        "fpr": 0.0142,
+        "fnr": 0.4306,
+        "operational_status": "HIGH_FALSE_NEGATIVES (Weak Anomaly Submerged by Noise)"
+      },
+      {
+        "noise_std": 0.035,
+        "anomaly_strength": "Medium",
+        "strength_range": "0.3-0.6",
+        "recall": 0.6849,
+        "precision": 0.9196,
+        "f1_score": 0.7844,
+        "fpr": 0.0024,
+        "fnr": 0.3151,
+        "operational_status": "HIGH_FALSE_NEGATIVES (Weak Anomaly Submerged by Noise)"
+      },
+      {
+        "noise_std": 0.035,
+        "anomaly_strength": "Strong",
+        "strength_range": "0.6-1.2",
+        "recall": 0.8402,
+        "precision": 0.93,
+        "f1_score": 0.8797,
+        "fpr": 0.0022,
+        "fnr": 0.1598,
+        "operational_status": "STABLE"
+      },
+      {
+        "noise_std": 0.06,
+        "anomaly_strength": "Very Weak",
+        "strength_range": "0.05-0.15",
+        "recall": 0.3081,
+        "precision": 0.1513,
+        "f1_score": 0.1965,
+        "fpr": 0.072,
+        "fnr": 0.6919,
+        "operational_status": "HIGH_FALSE_NEGATIVES (Weak Anomaly Submerged by Noise)"
+      },
+      {
+        "noise_std": 0.06,
+        "anomaly_strength": "Weak",
+        "strength_range": "0.15-0.3",
+        "recall": 0.5882,
+        "precision": 0.4566,
+        "f1_score": 0.5018,
+        "fpr": 0.0274,
+        "fnr": 0.4118,
+        "operational_status": "HIGH_FALSE_NEGATIVES (Weak Anomaly Submerged by Noise)"
+      },
+      {
+        "noise_std": 0.06,
+        "anomaly_strength": "Medium",
+        "strength_range": "0.3-0.6",
+        "recall": 0.6331,
+        "precision": 0.8195,
+        "f1_score": 0.7136,
+        "fpr": 0.0054,
+        "fnr": 0.3669,
+        "operational_status": "HIGH_FALSE_NEGATIVES (Weak Anomaly Submerged by Noise)"
+      },
+      {
+        "noise_std": 0.06,
+        "anomaly_strength": "Strong",
+        "strength_range": "0.6-1.2",
+        "recall": 0.7492,
+        "precision": 0.9397,
+        "f1_score": 0.829,
+        "fpr": 0.002,
+        "fnr": 0.2508,
+        "operational_status": "STABLE"
+      }
+    ]
+  },
+  "artifacts_generated": [
+    "C:\\SIH_ML\\ml\\outputs\\reports\\validation_experimental_summary.png",
+    "C:\\SIH_ML\\ml\\outputs\\reports\\validation_results_full.json"
+  ]
+}

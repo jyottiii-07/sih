@@ -1,0 +1,70 @@
+[
+  {
+    "_metadata": {
+      "fixture_type": "REAL-DATA SCHEMA FIXTURE",
+      "disclaimer": "SYNTHETIC DEVELOPMENT FIXTURE ONLY - NOT PHYSICAL SENSOR DATA",
+      "note": "Realistic 1 Hz spatial survey batch demonstrating nominal telemetry progression."
+    },
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:00",
+    "x": 5.0,
+    "y": 5.0,
+    "bx": 0.1845,
+    "by": 0.1725,
+    "bz": 0.3488
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:01",
+    "x": 6.0,
+    "y": 5.0,
+    "bx": 0.1852,
+    "by": 0.1731,
+    "bz": 0.3495
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:02",
+    "x": 7.0,
+    "y": 5.1,
+    "bx": 0.1860,
+    "by": 0.1740,
+    "bz": 0.3502
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:03",
+    "x": 8.0,
+    "y": 5.0,
+    "bx": 0.2450,
+    "by": 0.2310,
+    "bz": 0.4200
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:04",
+    "x": 9.0,
+    "y": 5.1,
+    "bx": 0.3120,
+    "by": 0.2980,
+    "bz": 0.5100
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:05",
+    "x": 10.0,
+    "y": 5.0,
+    "bx": 0.1880,
+    "by": 0.1750,
+    "bz": 0.3520
+  },
+  {
+    "sensor_id": "SFS-001",
+    "timestamp": "2026-08-27T10:00:06",
+    "x": 11.0,
+    "y": 5.2,
+    "bx": 0.1850,
+    "by": 0.1730,
+    "bz": 0.3490
+  }
+]
