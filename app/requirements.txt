@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+motor
+paho-mqtt>=2.0.0
+httpx
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+python-multipart
