@@ -22,40 +22,32 @@ from app.database import (
 )
 from app.ws_manager import manager
 from app.alert_service import evaluate_reading
+from app.sensor_adapters import sensor_dispatcher
 
 router = APIRouter()
 
 
 async def _process_single_reading(raw_dict: Dict[str, Any]) -> Dict[str, Any]:
-    """Helper to process, score, store, evaluate alerts, and broadcast a reading."""
-    # Ensure timestamp
-    ts = raw_dict.get("timestamp")
-    if isinstance(ts, datetime):
-        ts_str = ts.isoformat()
-    elif isinstance(ts, str) and ts:
-        ts_str = ts
-    else:
-        ts_str = datetime.now(timezone.utc).isoformat()
-
-    bx = float(raw_dict.get("bx", 0.0))
-    by = float(raw_dict.get("by", 0.0))
-    bz = float(raw_dict.get("bz", 0.0))
+    """Helper to normalize, score, store, evaluate alerts, and broadcast a reading."""
+    # Pass through sensor normalization adapter layer (Hall-Effect or 3-Axis)
+    norm = sensor_dispatcher.process(raw_dict)
 
     # ML Anomaly inference
-    ml_result = await classify_reading(raw_dict)
+    ml_result = await classify_reading(norm)
 
     doc = {
-        "sensor_id": str(raw_dict.get("sensor_id", "SFS-001")),
-        "timestamp": ts_str,
-        "x": float(raw_dict.get("x", 0.0)),
-        "y": float(raw_dict.get("y", 0.0)),
-        "bx": bx,
-        "by": by,
-        "bz": bz,
+        "sensor_id": norm["sensor_id"],
+        "timestamp": norm["timestamp"],
+        "x": norm["x"],
+        "y": norm["y"],
+        "bx": norm["bx"],
+        "by": norm["by"],
+        "bz": norm["bz"],
         "magnetic_signal": ml_result["magnetic_signal"],
         "anomaly_score": ml_result["anomaly_score"],
         "classification": ml_result["classification"],
-        "raw_payload": raw_dict,
+        "sensor_type": norm.get("sensor_type", "magnetometer_3axis"),
+        "raw_payload": norm.get("raw_payload", raw_dict),
     }
 
     # Save to database

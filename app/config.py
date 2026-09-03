@@ -23,5 +23,10 @@ JWT_SECRET = os.getenv("JWT_SECRET", "change_this_secret")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = 60 * 12
 
+# --- Sensor Hardware Mode ---
+SENSOR_MODE = os.getenv("SENSOR_MODE", "hall")  # "hall" | "magnetometer" | "mock"
+HALL_CALIBRATION_SAMPLES = int(os.getenv("HALL_CALIBRATION_SAMPLES", "20"))
+HALL_DEFAULT_BASELINE = float(os.getenv("HALL_DEFAULT_BASELINE", "4095.0"))
+
 # --- Alerting ---
 METAL_ALERT_THRESHOLD = float(os.getenv("METAL_ALERT_THRESHOLD", 75.0))

@@ -10,40 +10,31 @@ from app.database import insert_reading
 from app.ml_client import classify_reading
 from app.ws_manager import manager
 from app.alert_service import evaluate_reading
+from app.sensor_adapters import sensor_dispatcher
 
 _loop = None
 
 
 async def handle_reading(payload: dict):
-    """Processes incoming magnetometer telemetry from MQTT topic."""
-    # Ensure timestamp
-    ts = payload.get("timestamp")
-    if not ts:
-        ts = datetime.now(timezone.utc).isoformat()
-
-    # Determine coordinates
-    x = float(payload.get("x", payload.get("lng", 0.0)))
-    y = float(payload.get("y", payload.get("lat", 0.0)))
-
-    # Raw magnetic field components
-    bx = float(payload.get("bx", 0.0))
-    by = float(payload.get("by", 0.0))
-    bz = float(payload.get("bz", 0.0))
+    """Processes incoming sensor telemetry from MQTT topic."""
+    norm = sensor_dispatcher.process(payload)
 
     # ML Inference
-    ml_result = await classify_reading(payload)
+    ml_result = await classify_reading(norm)
 
     doc = {
-        "sensor_id": str(payload.get("sensor_id", payload.get("device_id", "SFS-001"))),
-        "timestamp": str(ts),
-        "x": x,
-        "y": y,
-        "bx": bx,
-        "by": by,
-        "bz": bz,
+        "sensor_id": norm["sensor_id"],
+        "timestamp": norm["timestamp"],
+        "x": norm["x"],
+        "y": norm["y"],
+        "bx": norm["bx"],
+        "by": norm["by"],
+        "bz": norm["bz"],
         "magnetic_signal": ml_result["magnetic_signal"],
         "anomaly_score": ml_result["anomaly_score"],
         "classification": ml_result["classification"],
+        "sensor_type": norm.get("sensor_type", "magnetometer_3axis"),
+        "raw_payload": norm.get("raw_payload", payload),
     }
 
     # Save to SQLite

@@ -12,9 +12,13 @@ class RawSensorReadingIn(BaseModel):
     timestamp: Optional[str] = None
     x: float
     y: float
-    bx: float
-    by: float
-    bz: float
+    bx: Optional[float] = 0.0
+    by: Optional[float] = 0.0
+    bz: Optional[float] = 0.0
+    raw_adc: Optional[float] = None
+    adc: Optional[float] = None
+    raw_hall_value: Optional[float] = None
+    sensor_type: Optional[str] = None
 
 
 class ProcessedSensorReadingOut(BaseModel):
@@ -28,6 +32,7 @@ class ProcessedSensorReadingOut(BaseModel):
     magnetic_signal: float
     anomaly_score: float
     classification: Literal["normal", "weak_anomaly", "strong_anomaly"]
+    sensor_type: Optional[str] = None
 
 
 class ReadingsBatchResponse(BaseModel):

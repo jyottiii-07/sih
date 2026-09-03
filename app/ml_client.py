@@ -23,12 +23,12 @@ def get_ml_pipeline():
 
 async def classify_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Performs ML inference on raw magnetometer reading.
-    Extracts 3D magnetic field magnitude and computes anomaly score & classification.
+    Performs anomaly inference on sensor reading.
     
-    Supports both:
-    1. Normalized survey units (baseline ~0.45) via trained IsolationForest model
-    2. Physical microTesla / engineering units (geomagnetic background ~45.0 uT)
+    Supports:
+    1. Single-Axis Hall-Effect Sensor: normalized response signal [0.0, 1.0]
+    2. 3-Axis Magnetometer in MicroTesla units (geomagnetic background ~45.0 uT)
+    3. 3-Axis Magnetometer in Normalized survey units (baseline ~0.45) via IsolationForest
     
     Returns:
         {
@@ -37,6 +37,28 @@ async def classify_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
             "classification": "normal" | "weak_anomaly" | "strong_anomaly"
         }
     """
+    sensor_type = payload.get("sensor_type")
+
+    # --- Mode 1: Single-Axis Hall-Effect Sensor ---
+    if sensor_type == "hall_effect":
+        # Hall normalized signal S_norm in [0.0, 1.0] derived from baseline deviation
+        s_norm = float(payload.get("magnetic_signal", payload.get("bz", 0.0)))
+        anomaly_score = round(max(0.0, min(1.0, s_norm)), 4)
+        
+        if anomaly_score >= 0.70:
+            classification = "strong_anomaly"
+        elif anomaly_score >= 0.40:
+            classification = "weak_anomaly"
+        else:
+            classification = "normal"
+            
+        return {
+            "magnetic_signal": anomaly_score,
+            "anomaly_score": anomaly_score,
+            "classification": classification,
+        }
+
+    # --- Mode 2: 3-Axis Physical Magnetometer (Unchanged Path) ---
     bx = float(payload.get("bx", 0.0))
     by = float(payload.get("by", 0.0))
     bz = float(payload.get("bz", 0.0))

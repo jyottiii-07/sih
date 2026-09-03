@@ -32,6 +32,8 @@ export interface SensorReading {
   anomaly_score: number;
   /** Upstream ML model anomaly classification */
   classification: Classification;
+  /** Sensing technology mode (e.g. 'hall_effect' or 'magnetometer_3axis') */
+  sensor_type?: string;
 }
 
 /**

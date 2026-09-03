@@ -33,6 +33,7 @@ export const SensorReadingSchema = z
       .min(0.0, 'anomaly_score cannot be less than 0.0')
       .max(1.0, 'anomaly_score cannot exceed 1.0'),
     classification: ClassificationSchema,
+    sensor_type: z.string().optional(),
   })
   .strict();
 

@@ -1,107 +1,151 @@
 # Architecture & Technical Design Blueprint
-## Problem Statement ID: 26064 — NCPOR / MoES Seafloor Metal Detection Sensor Frontend
+## Problem Statement ID: 26064 — NCPOR / MoES Seafloor Metal Detection Sensor
 
 ---
 
 ## 1. Architectural Philosophy
 
-The frontend architecture is designed around two foundational tenets:
-1. **Strict Data-Source Agnosticism**: UI presentation components must be completely decoupled from data access mechanics. Whether data originates from local static JSON, real-time mock playback, or a future production WebSocket/REST gateway, the UI interacts exclusively through a unified data adapter interface and React Context.
-2. **Deterministic Data Contract**: All incoming data packets are subjected to strict runtime validation via Zod at the adapter boundary before entering application state, ensuring malformed payloads cannot cause runtime crashes in visualization components.
+The system architecture is designed around three foundational tenets:
+1. **Multi-Mode Sensor Abstraction**: Hardware sensing mechanisms are decoupled through a lightweight **Sensor Adapter Layer** (`app/sensor_adapters.py`). The system dynamically handles:
+   - **Single-Axis Hall-Effect Sensing** (ESP32 ADC with automatic baseline calibration and dynamic range normalization).
+   - **3-Axis Magnetometer Sensing** (QMC5883L/HMC5883L physical 3-axis vector data).
+   - **Mock Survey Simulation Mode** (256-point high-fidelity survey dataset).
+2. **Deterministic Data Contract**: All incoming data packets are validated via Zod at the frontend boundary and Pydantic at the backend boundary before entering application state, ensuring malformed payloads cannot cause runtime crashes.
+3. **Physical & Scientific Accuracy**: Single-axis Hall data is processed as a dimensionless normalized magnetic response $S_{\text{norm}} \in [0.0, 1.0]$. The system does NOT falsely claim single-axis Hall data to be 3-axis vector measurements or calibrated $\mu\text{T}$ measurements without physical tri-axial sensors.
 
 ---
 
-## 2. Layered Architecture & Data Flow
+## 2. Hardware Classification & Roadmap
+
+### Current Demonstrated Physical Prototype
+* **Sensor**: 4-Pin Single-Axis Hall-Effect Sensor Module (A0 to ESP32 GPIO 34 / ADC1).
+* **Microcontroller**: ESP32 DOIT DEVKIT V1 (12-bit ADC, oversampling filter, WiFi HTTP/MQTT client).
+* **Measurement Type**: **Magnetic anomaly detection of magnetically susceptible (ferromagnetic) targets**.
+* **Operational Principle**: Magnet proximity causes Hall voltage variation, driving ADC from resting baseline ($ADC_{\text{baseline}} \approx 4095$) towards zero ($ADC \approx 0$).
+* **Baseline Calibration**: Dynamic automatic calibration on startup (averaging resting samples) + dynamic range deviation normalization.
+* **Internal Representation**: $B_x=0.0, B_y=0.0, B_z=S_{\text{norm}}$ is strictly an internal backward-compatible contract mapping representing the 1D active sensing axis magnitude.
+
+### Future Upgrade: 3-Axis Tri-Axial Magnetometer
+* **Sensors**: QMC5883L / HMC5883L / PNI RM3100.
+* **Capability**: Full spatial magnetic vector field decomposition ($B_x, B_y, B_z$) and true geomagnetic background estimation in physical $\mu\text{T}$ engineering units.
+
+### Future Upgrade: Non-Magnetic Metal Detection
+* **Technology**: Electromagnetic Induction / Pulse Induction (PI) / Eddy-Current Sensing.
+* **Capability**: Detection of non-ferrous, non-magnetic conductive ocean resources (copper, aluminum, silver, gold, manganese nodules).
+
+---
+
+## 3. Layered Architecture & Data Flow
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
-│                        DATA SOURCES                                    │
+│                        DATA SOURCES & HARDWARE                         │
 │   ┌─────────────────────────────┐    ┌─────────────────────────────┐   │
-│   │   Mock JSON / Streamer      │    │  Backend REST / WS / SSE    │   │
-│   │  (src/data/mockSensorData)  │    │  (Provisional API Gateway)  │   │
+│   │   ESP32 Hall-Effect Sensor  │    │   3-Axis Magnetometer Node  │   │
+│   │  (raw_adc via REST / MQTT)  │    │   (bx, by, bz via REST/MQTT)│   │
 │   └──────────────┬──────────────┘    └──────────────┬──────────────┘   │
-└──────────────────┼──────────────────────────────────┼──────────────────┘
-                   │                                  │
-┌──────────────────▼──────────────────────────────────▼──────────────────┐
-│                   DATA ADAPTER BOUNDARY                                │
+│                  │                                  │                  │
+│   ┌──────────────┴──────────────────────────────────┴──────────────┐   │
+│   │               Mock JSON / Timed Stream Simulator               │   │
+│   └──────────────────────────────┬─────────────────────────────────┘   │
+└──────────────────────────────────┼─────────────────────────────────────┘
+                                   │ (HTTP POST / MQTT / Mock Feed)
+┌──────────────────────────────────▼─────────────────────────────────────┐
+│             BACKEND INGESTION & SENSOR ADAPTER LAYER                   │
 │   ┌────────────────────────────────────────────────────────────────┐   │
-│   │               ISensorDataProvider Interface                    │   │
-│   │         ├── MockSensorProvider                                 │   │
-│   │         └── ApiSensorProvider (Provisional Skeleton)           │   │
+│   │               SensorAdapterDispatcher                          │   │
+│   │   ├── HallEffectSensorAdapter (Baseline Calib, Noise Filter)   │   │
+│   │   └── Magnetometer3AxisAdapter (Vector Norm Preservation)      │   │
 │   └────────────────────────────────┬───────────────────────────────┘   │
-└────────────────────────────────────┼───────────────────────────────────┘
-                                     │
+│                                    │
+│   ┌────────────────────────────────▼───────────────────────────────┐   │
+│   │               ML Anomaly Scoring & Classification              │   │
+│   │   ├── Hall Normalized Signal Scoring (0-1 mapping)             │   │
+│   │   └── Isolation Forest / Geomagnetic Baseline Scoring          │   │
+│   └────────────────────────────────┬───────────────────────────────┘   │
+│                                    │
+│   ┌────────────────────────────────┴───────────────────────────────┐   │
+│   ▼                                                                ▼   │
+│ SQLite DB (seafloor.db)                                 WebSocket Manager
+│ (Spatial/Temporal Indexes)                              (/ws/telemetry)
+└────────────────────────────────────┬───────────────────────────────────┘
+                                     │ (WebSocket / REST JSON)
 ┌────────────────────────────────────▼───────────────────────────────────┐
-│              RUNTIME VALIDATION & NORMALIZATION (ZOD)                   │
-│   ├── Strict 10-Field Schema Validation (Rejects unauthorized keys)    │
-│   └── Classification & Coordinate Integrity Enforcement                │
+│              FRONTEND ADAPTER & VALIDATION (ZOD)                       │
+│   ├── ISensorDataProvider (ApiSensorProvider / MockSensorProvider)    │
+│   └── Strict 10-Field Contract Validation                              │
 └────────────────────────────────────┬───────────────────────────────────┘
                                      │
 ┌────────────────────────────────────▼───────────────────────────────────┐
 │                    APPLICATION STATE & CONTEXT                         │
 │   ├── SensorDataContext (Readings array, streaming index, selection)   │
-│   └── Memoized Custom Hooks:                                           │
-│         ├── useSensorData()      ──► Access active telemetry & stream  │
-│         ├── useTelemetryStats()  ──► Aggregated counters & metrics     │
-│         └── useSurveyGrid()      ──► Viewport scaling, zoom & pan      │
+│   └── Memoized Hooks (useSensorData, useTelemetryStats, useSurveyGrid) │
 └────────────────────────────────────┬───────────────────────────────────┘
                                      │
 ┌────────────────────────────────────▼───────────────────────────────────┐
 │                     PRESENTATION LAYER (UI)                            │
 │   ┌───────────────┬─────────────────┬────────────────┬─────────────┐   │
 │   │  Dashboard    │  Survey Grid    │   Analytics    │  Data Logs  │   │
-│   │  (Overview)   │  (Heatmap)      │   (Charts)     │  (Export)   │   │
+│   │  (Overview)   │  (2D Heatmap)   │   (Charts)     │  (Export)   │   │
 │   └───────────────┴─────────────────┴────────────────┴─────────────┘   │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Directory Layout & Module Responsibilities
+## 4. Telemetry Transformation Pipeline: Hall Sensor
 
-```text
-src/
-├── assets/                  # Static SVG badges, institutional branding
-├── components/
-│   ├── common/              # Shared UI primitives (Badge, Card, Button, DetailDrawer, StateViews)
-│   ├── layout/              # Structural shells (Navbar, Footer, Shell, PlaybackControls)
-│   ├── dashboard/           # Dashboard-specific widgets (MetricCard, LatestTelemetryCard, etc.)
-│   ├── visualization/       # Survey grid components (SurveyHeatmap, GridControls, HeatmapLegend)
-│   ├── analytics/           # Scientific charts (VectorChart, SignalChart, AnomalyChart, ScatterChart)
-│   └── data/                # Data management components (LogsTable, TableFilters, ExportActions)
-├── context/
-│   └── SensorDataContext.tsx # Centralized application state and simulation stream runner
-├── data/
-│   └── mockSensorData.json  # 256-point high-fidelity mock survey dataset
-├── hooks/
-│   ├── useSensorData.ts     # Primary hook for components consuming sensor readings
-│   ├── useSurveyGrid.ts     # Geometric transformation, bounding box, and zoom/pan logic
-│   └── useTelemetryStats.ts # Real-time aggregation of anomaly ratios, peaks, and counts
-├── pages/
-│   ├── Dashboard/           # Mission Control Overview View
-│   ├── Survey/              # Seafloor Survey Grid & Heatmap View
-│   ├── Analytics/           # Scientific Time-Series & Cross-Plot View
-│   └── Logs/                # Tabular Telemetry Inspector & Data Exporter
-├── services/
-│   ├── api/
-│   │   └── apiProvider.ts   # Provisional REST/WebSocket integration client
-│   ├── mock/
-│   │   └── mockProvider.ts  # Local JSON data loader and timed stream simulator
-│   └── sensorService.ts     # Data provider factory and contract interface
-├── styles/
-│   └── index.css            # Tailwind directives, color variables, custom animations
-├── types/
-│   └── sensor.ts            # Strict 10-field TypeScript types and UI state models
-└── utils/
-    ├── export.ts            # Formatted CSV and JSON data export utility
-    └── validation.ts        # Zod runtime schemas, error formats, and batch parser
-```
+For incoming single-axis Hall readings, the transformation stages are:
+
+1. **Physical Acquisition**: ESP32 reads 12-bit ADC on GPIO34 (oversampled 10x).
+2. **Startup Baseline Calibration**: $ADC_{\text{baseline}} = \text{median}(\text{initial } N \text{ resting readings})$.
+3. **Baseline Deviation**: $\Delta = \max(0, ADC_{\text{baseline}} - ADC_{\text{filtered}})$.
+4. **Dynamic Range Normalization**:
+   $$S_{\text{norm}} = \text{clamp}\left(\frac{\Delta}{ADC_{\text{baseline}} - ADC_{\text{floor}}}, 0.0, 1.0\right)$$
+5. **Magnetic Signal**: $\text{magnetic\_signal} = S_{\text{norm}}$ (Dimensionless normalized magnetic response).
+6. **ML Anomaly Score**: $\text{anomaly\_score} = S_{\text{norm}} \in [0.0, 1.0]$.
+7. **3-Tier Classification**:
+   - $0.00 \le \text{Score} < 0.40 \implies \text{normal}$
+   - $0.40 \le \text{Score} < 0.70 \implies \text{weak\_anomaly}$
+   - $0.70 \le \text{Score} \le 1.00 \implies \text{strong\_anomaly}$
 
 ---
 
-## 4. Why UI Components Never Directly Fetch Data
+## 5. Directory Layout & Module Responsibilities
 
-Direct data fetching in UI components violates single-responsibility principles and tightly couples presentation to the network transport layer. In this architecture:
-1. **Zero UI Code Changes on Hardware Arrival**: When the backend API is deployed, flipping `VITE_USE_MOCK_DATA=false` switches the provider without altering any JSX or CSS.
-2. **Uniform Error & Loading States**: The `SensorDataContext` standardizes loading, empty, and error lifecycles across all four primary views.
-3. **Optimized Render Cycles**: Derived metrics ($Bx/By/Bz$ aggregations, anomaly ratios) are computed and memoized at the context layer, avoiding redundant per-component recalculation.
+```text
+SIH/sih/
+├── app/                           # FastAPI Backend & Multi-Sensor Engine
+│   ├── main.py                    # App entrypoint, CORS, routes & WebSockets
+│   ├── sensor_adapters.py         # Hall-Effect & 3-Axis normalization adapters
+│   ├── routes.py                  # Ingestion & grid matrix endpoints
+│   ├── database.py                # Async SQLite storage & indexing
+│   ├── ml_client.py               # Scale-aware ML inference bridge
+│   ├── mqtt_client.py             # MQTT background telemetry receiver
+│   ├── ws_manager.py              # WebSocket connection manager
+│   ├── alert_service.py           # Anomaly threshold & alert evaluator
+│   └── schemas.py                 # Pydantic schemas supporting Hall & 3-axis
+├── scripts/                       # Firmware & Simulation Utilities
+│   ├── esp32_hall_firmware.ino    # Complete ESP32 Arduino C++ firmware
+│   └── esp32_hall_simulator.py    # Python survey grid test simulator
+├── calibration/                   # Calibration Module
+│   └── corrector.py               # Hard-iron & soft-iron physics corrector
+├── models/                        # Pre-trained ML Artifacts
+│   ├── isolation_forest.joblib    # Isolation Forest anomaly detector
+│   └── score_normalizer.joblib    # Calibrated score normalizer
+├── src/                           # Frontend React Application & ML Pipeline
+│   ├── components/                # Modular UI widgets (dashboard, survey, analytics, logs)
+│   ├── context/                   # SensorDataContext application state
+│   ├── hooks/                     # Custom hooks (useSensorData, useSurveyGrid, etc.)
+│   ├── pages/                     # Dashboard, Survey, Analytics, Logs views
+│   ├── services/                  # Unified ISensorDataProvider (API + Mock)
+│   ├── utils/                     # Zod runtime validation & export utilities
+│   ├── pipeline.py                # Python ML training & validation pipeline
+│   ├── features.py                # Feature extraction module
+│   └── anomaly_detector.py        # ML anomaly detector
+├── tests/                         # Pytest Suite (79 unit & integration tests)
+├── seafloor.db                    # Active SQLite database file
+├── ARCHITECTURE.md                # System architectural blueprint
+├── DATA-CONTRACT.md               # Strict data interchange definition
+└── package.json / requirements.txt# Dependencies
+```
