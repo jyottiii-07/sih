@@ -176,6 +176,8 @@ async def fetch_alerts(
 async def reset_readings():
     """Clears all sensor data from the database for re-testing."""
     deleted = await delete_all_readings()
+    sensor_dispatcher.hall_adapter.reset_calibration()
+    await manager.broadcast("mission_reset", {"status": "reset", "deleted_count": deleted})
     return {
         "status": "success",
         "message": f"Successfully deleted {deleted} survey records.",

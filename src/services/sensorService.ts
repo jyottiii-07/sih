@@ -20,6 +20,8 @@ export interface ISensorDataProvider {
   subscribeToBatch?(callback: BatchReadingsSubscriber): () => void;
   /** Returns whether provider is operating in mock mode */
   isMockMode(): boolean;
+  /** Clears all historical survey readings from database/state */
+  clearAllReadings?(): Promise<void>;
 }
 
 let providerInstance: ISensorDataProvider | null = null;

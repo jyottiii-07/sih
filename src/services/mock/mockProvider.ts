@@ -37,6 +37,13 @@ export class MockSensorProvider implements ISensorDataProvider {
     return Promise.resolve(index >= 0 ? this.readings[index] : null);
   }
 
+  public async clearAllReadings(): Promise<void> {
+    this.readings = [];
+    this.currentIndex = 0;
+    this.notifyBatch([]);
+    return Promise.resolve();
+  }
+
   public subscribeToReadings(callback: ReadingSubscriber): () => void {
     this.subscribers.add(callback);
     return () => {

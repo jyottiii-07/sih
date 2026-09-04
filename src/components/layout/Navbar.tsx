@@ -11,6 +11,7 @@ import {
   LineChart,
   Table,
   Radio,
+  RotateCcw,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -19,8 +20,20 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
-  const { dataSource } = useSensorData();
+  const { dataSource, clearData } = useSensorData();
   const { activeSensorId } = useTelemetryStats();
+  const [isResetting, setIsResetting] = React.useState(false);
+
+  const handleResetSurvey = async () => {
+    if (window.confirm('Reset all survey readings and clear data back to zero?')) {
+      try {
+        setIsResetting(true);
+        await clearData();
+      } finally {
+        setIsResetting(false);
+      }
+    }
+  };
 
   const navItems: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
@@ -86,6 +99,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
           </div>
 
           <PlaybackControls />
+
+          {/* Reset Survey Action Button */}
+          <button
+            onClick={handleResetSurvey}
+            disabled={isResetting}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-red-700 bg-slate-100 hover:bg-red-50 border border-slate-200 hover:border-red-200 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+            title="Clear all readings from database and reset survey back to zero"
+          >
+            <RotateCcw className={`w-3.5 h-3.5 text-slate-500 ${isResetting ? 'animate-spin text-red-600' : ''}`} />
+            <span className="hidden sm:inline font-mono">Reset Survey</span>
+          </button>
 
           {/* Active Sensor Tag */}
           <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-xs font-mono text-slate-700">

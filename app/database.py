@@ -110,7 +110,7 @@ async def get_readings(
     sort_desc: bool = False,
 ) -> List[Dict[str, Any]]:
     """Fetches historical readings matching query criteria."""
-    query = "SELECT sensor_id, timestamp, x, y, bx, by, bz, magnetic_signal, anomaly_score, classification, raw_payload FROM readings"
+    query = "SELECT id, sensor_id, timestamp, x, y, bx, by, bz, magnetic_signal, anomaly_score, classification, raw_payload FROM readings"
     params = []
     conditions = []
 
@@ -124,8 +124,11 @@ async def get_readings(
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
 
-    order = "DESC" if sort_desc else "ASC"
-    query += f" ORDER BY id {order} LIMIT ?"
+    if not sort_desc:
+        # Fetch the most recent N records, ordered chronologically
+        query = f"SELECT * FROM ({query} ORDER BY id DESC LIMIT ?) sub ORDER BY id ASC"
+    else:
+        query += " ORDER BY id DESC LIMIT ?"
     params.append(limit)
 
     async with aiosqlite.connect(DB_PATH) as db:
@@ -239,6 +242,10 @@ async def delete_all_readings() -> int:
         cursor = await db.execute("DELETE FROM readings")
         deleted = cursor.rowcount
         await db.execute("DELETE FROM alerts")
+        try:
+            await db.execute("DELETE FROM sqlite_sequence WHERE name IN ('readings', 'alerts')")
+        except Exception:
+            pass
         await db.commit()
         return deleted
 

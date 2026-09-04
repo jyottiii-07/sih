@@ -29,6 +29,7 @@ export interface SensorDataContextType {
   stepPlayback: () => void;
   setPlaybackSpeed: (speed: number) => void;
   refreshData: () => Promise<void>;
+  clearData: () => Promise<void>;
 }
 
 export const SensorDataContext = createContext<SensorDataContextType | null>(null);
@@ -163,6 +164,24 @@ export const SensorDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   }, [provider, isPlaying]);
 
+  const clearData = useCallback(async () => {
+    try {
+      setStatus('loading');
+      if (provider.clearAllReadings) {
+        await provider.clearAllReadings();
+      }
+      setAllReadings([]);
+      setActiveReadings([]);
+      setPlaybackIndex(0);
+      setSelectedReading(null);
+      setStatus('idle');
+    } catch (err) {
+      console.error('[SensorDataContext] Failed to clear data:', err);
+      setStatus('error');
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to clear survey data');
+    }
+  }, [provider]);
+
   // Filtered readings computation
   const filteredReadings = useMemo(() => {
     return activeReadings.filter((reading) => {
@@ -213,6 +232,7 @@ export const SensorDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       stepPlayback,
       setPlaybackSpeed,
       refreshData: loadInitialData,
+      clearData,
     }),
     [
       activeReadings,
@@ -233,6 +253,7 @@ export const SensorDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       stepPlayback,
       setPlaybackSpeed,
       loadInitialData,
+      clearData,
     ]
   );
 

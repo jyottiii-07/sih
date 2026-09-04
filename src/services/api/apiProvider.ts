@@ -105,6 +105,21 @@ export class ApiSensorProvider implements ISensorDataProvider {
     };
   }
 
+  public async clearAllReadings(): Promise<void> {
+    try {
+      const response = await fetch(`${this.apiBaseUrl}/readings`, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json' },
+      });
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('[ApiSensorProvider] Failed to clear readings:', error);
+      throw error;
+    }
+  }
+
   public subscribeToBatch(callback: BatchReadingsSubscriber): () => void {
     this.batchSubscribers.add(callback);
     return () => {
@@ -128,6 +143,12 @@ export class ApiSensorProvider implements ISensorDataProvider {
       this.ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
+          // If server triggers mission reset, notify batch subscribers with empty list
+          if (message.event === 'mission_reset') {
+            this.batchSubscribers.forEach((cb) => cb([]));
+            return;
+          }
+
           // If message is an event envelope, ignore non-telemetry events
           if (message.event && message.event !== 'sensor_reading' && message.event !== 'new_reading') {
             return;
