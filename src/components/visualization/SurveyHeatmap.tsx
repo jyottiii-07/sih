@@ -16,10 +16,23 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
   const containerRef = useRef<HTMLDivElement>(null);
 
   const maxCoord = React.useMemo(() => {
-    if (readings.length === 0) return 60;
+    if (readings.length === 0) return 50;
     const maxVal = Math.max(...readings.map((r) => Math.max(r.x, r.y, 0)));
-    return Math.max(60, Math.ceil(maxVal / 10) * 10);
+    if (maxVal <= 50) return 50;
+    return Math.ceil(maxVal / 10) * 10;
   }, [readings]);
+
+  // Maps reading coordinate into the dead-center of its 10x10 cell square (e.g. 0 -> 5, 10 -> 15, 20 -> 25)
+  const toCellCenter = useCallback(
+    (val: number, step: number = 10): number => {
+      // If already near center (e.g. 5, 15, 25, 35, 45)
+      if (Math.abs((val % step) - step / 2) < 0.5) return val;
+      // If on cell boundary (e.g. 0, 10, 20, 30, 40)
+      const cellIdx = Math.min(Math.floor(val / step), Math.floor(maxCoord / step) - 1);
+      return cellIdx * step + step / 2;
+    },
+    [maxCoord]
+  );
 
   const {
     config,
@@ -163,8 +176,8 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
           <defs>
             {/* Soft Transparent Gradient for Strong Anomalies */}
             <radialGradient id="strongGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#e11d48" stopOpacity="0.3" />
-              <stop offset="60%" stopColor="#e11d48" stopOpacity="0.1" />
+              <stop offset="0%" stopColor="#e11d48" stopOpacity="0.35" />
+              <stop offset="60%" stopColor="#e11d48" stopOpacity="0.12" />
               <stop offset="100%" stopColor="#e11d48" stopOpacity="0" />
             </radialGradient>
 
@@ -207,7 +220,7 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
                   x2={svgX}
                   y2={viewBoxHeight - padding}
                   stroke="#e2e8f0"
-                  strokeWidth={tick % 20 === 0 ? '1.2' : '0.75'}
+                  strokeWidth={1}
                   strokeDasharray={tick % 20 === 0 ? 'none' : '3 3'}
                 />
                 {/* X Axis Label */}
@@ -230,7 +243,7 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
                   x2={viewBoxWidth - padding}
                   y2={svgY}
                   stroke="#e2e8f0"
-                  strokeWidth={tick % 20 === 0 ? '1.2' : '0.75'}
+                  strokeWidth={1}
                   strokeDasharray={tick % 20 === 0 ? 'none' : '3 3'}
                 />
                 {/* Y Axis Label */}
@@ -281,8 +294,10 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
             visibleReadings
               .filter((r) => r.classification === 'strong_anomaly')
               .map((r, idx) => {
-                const { svgX, svgY } = mapToSvg(r.x, r.y);
-                const haloRadius = 24 + r.anomaly_score * 14;
+                const cx = toCellCenter(r.x);
+                const cy = toCellCenter(r.y);
+                const { svgX, svgY } = mapToSvg(cx, cy);
+                const haloRadius = 26 + r.anomaly_score * 12;
                 return (
                   <circle
                     key={`halo-${idx}`}
@@ -295,27 +310,29 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
                 );
               })}
 
-          {/* Layer 2: Plotted Sensor Reading Markers */}
+          {/* Layer 2: Centered Sensor Reading Markers */}
           {visibleReadings.map((r, idx) => {
-            const { svgX, svgY } = mapToSvg(r.x, r.y);
+            const cx = toCellCenter(r.x);
+            const cy = toCellCenter(r.y);
+            const { svgX, svgY } = mapToSvg(cx, cy);
             const isHovered = hoveredReading === r;
             const isSelected =
               selectedReading?.timestamp === r.timestamp &&
-              selectedReading?.x === r.x &&
-              selectedReading?.y === r.y;
+              Math.abs(toCellCenter(selectedReading.x) - cx) < 1 &&
+              Math.abs(toCellCenter(selectedReading.y) - cy) < 1;
 
             let fillColor = '#10b981';
             let strokeColor = '#059669';
-            let radius = 4.5;
+            let radius = 5;
 
             if (r.classification === 'strong_anomaly') {
               fillColor = '#e11d48';
               strokeColor = '#be123c';
-              radius = 6.5;
+              radius = 7;
             } else if (r.classification === 'weak_anomaly') {
               fillColor = '#f59e0b';
               strokeColor = '#d97706';
-              radius = 5.5;
+              radius = 6;
             }
 
             return (
@@ -326,7 +343,7 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
                 onMouseEnter={() => setHoveredReading(r)}
                 onMouseLeave={() => setHoveredReading(null)}
               >
-                {/* Primary Data Dot */}
+                {/* Sensor Marker Dot */}
                 <circle
                   cx={svgX}
                   cy={svgY}
@@ -343,7 +360,7 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
                     <circle
                       cx={svgX}
                       cy={svgY}
-                      r={radius + 7}
+                      r={radius + 8}
                       fill="none"
                       stroke="#2563eb"
                       strokeWidth="1.5"
@@ -355,7 +372,7 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
                       x2={svgX + 16}
                       y2={svgY}
                       stroke="#2563eb"
-                      strokeWidth="1"
+                      strokeWidth="1.2"
                     />
                     <line
                       x1={svgX}
@@ -363,7 +380,7 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
                       x2={svgX}
                       y2={svgY + 16}
                       stroke="#2563eb"
-                      strokeWidth="1"
+                      strokeWidth="1.2"
                     />
                   </g>
                 )}
@@ -383,7 +400,7 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
           >
             <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-slate-100">
               <span className="font-mono font-bold text-slate-900">
-                Coords: ({hoveredReading.x.toFixed(1)}, {hoveredReading.y.toFixed(1)})
+                Cell [{Math.floor(toCellCenter(hoveredReading.x)/10)}, {Math.floor(toCellCenter(hoveredReading.y)/10)}] &bull; ({toCellCenter(hoveredReading.x).toFixed(0)}, {toCellCenter(hoveredReading.y).toFixed(0)})
               </span>
               <AnomalyBadge classification={hoveredReading.classification} size="sm" showIcon={false} />
             </div>
@@ -416,14 +433,14 @@ export const SurveyHeatmap: React.FC<SurveyHeatmapProps> = ({ onSelectReading })
       <div className="p-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2 font-mono">
         <div className="flex items-center gap-3">
           <span>
-            EXTENTS: <strong className="text-slate-800">[0, 60] × [0, 60]</strong>
+            EXTENTS: <strong className="text-slate-800">[0, {maxCoord}] × [0, {maxCoord}]</strong>
           </span>
           <span>&bull;</span>
           <span>
             SELECTION:{' '}
             {selectedReading ? (
               <strong className="text-blue-600 font-bold">
-                ({selectedReading.x}, {selectedReading.y})
+                Cell [{Math.floor(toCellCenter(selectedReading.x)/10)}, {Math.floor(toCellCenter(selectedReading.y)/10)}] @ ({toCellCenter(selectedReading.x).toFixed(0)}, {toCellCenter(selectedReading.y).toFixed(0)})
               </strong>
             ) : (
               <span className="text-slate-400">None</span>

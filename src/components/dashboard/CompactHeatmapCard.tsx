@@ -13,17 +13,29 @@ export const CompactHeatmapCard: React.FC<CompactHeatmapCardProps> = ({ onOpenSu
 
   const size = 280;
   const padding = 20;
+
   const maxCoord = React.useMemo(() => {
-    if (readings.length === 0) return 60;
+    if (readings.length === 0) return 50;
     const maxVal = Math.max(...readings.map((r) => Math.max(r.x, r.y, 0)));
-    return Math.max(60, Math.ceil(maxVal / 10) * 10);
+    if (maxVal <= 50) return 50;
+    return Math.ceil(maxVal / 10) * 10;
   }, [readings]);
+
+  // Center coordinate mapping for placing the dot in the middle of each cell
+  const toCellCenter = (val: number, step: number = 10) => {
+    if (Math.abs((val % step) - step / 2) < 0.5) return val;
+    const cellIdx = Math.min(Math.floor(val / step), Math.floor(maxCoord / step) - 1);
+    return cellIdx * step + step / 2;
+  };
 
   const mapCoord = (val: number, max: number = maxCoord) => {
     return padding + (val / (max || 1)) * (size - padding * 2);
   };
 
-  const gridTicks = [0, maxCoord * 0.25, maxCoord * 0.5, maxCoord * 0.75, maxCoord].map((t) => Math.round(t));
+  const gridTicks: number[] = [];
+  for (let t = 0; t <= maxCoord; t += 10) {
+    gridTicks.push(t);
+  }
 
   return (
     <Card
@@ -40,6 +52,13 @@ export const CompactHeatmapCard: React.FC<CompactHeatmapCardProps> = ({ onOpenSu
         {/* SVG Mini Grid Canvas */}
         <div className="relative w-full max-w-[280px] aspect-square bg-slate-50 rounded-lg border border-slate-200 overflow-hidden p-1 shadow-inner">
           <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full">
+            <defs>
+              <radialGradient id="miniStrongGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#e11d48" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#e11d48" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+
             {/* Grid background lines */}
             {gridTicks.map((tick) => {
               const pos = mapCoord(tick);
@@ -67,41 +86,48 @@ export const CompactHeatmapCard: React.FC<CompactHeatmapCardProps> = ({ onOpenSu
               );
             })}
 
-            {/* Plotted points */}
+            {/* Centered Plotted Sensor Points */}
             {readings.map((r, i) => {
-              const cx = mapCoord(r.x);
-              const cy = size - mapCoord(r.y);
-              const isSelected = selectedReading?.timestamp === r.timestamp && selectedReading?.x === r.x && selectedReading?.y === r.y;
+              const cxVal = toCellCenter(r.x);
+              const cyVal = toCellCenter(r.y);
+              const cx = mapCoord(cxVal);
+              const cy = size - mapCoord(cyVal);
+              const isSelected =
+                selectedReading?.timestamp === r.timestamp &&
+                Math.abs(toCellCenter(selectedReading.x) - cxVal) < 1 &&
+                Math.abs(toCellCenter(selectedReading.y) - cyVal) < 1;
 
               let fillColor = '#10b981';
-              let radius = 2.5;
+              let radius = 3.5;
 
               if (r.classification === 'strong_anomaly') {
                 fillColor = '#e11d48';
-                radius = 5;
+                radius = 5.5;
               } else if (r.classification === 'weak_anomaly') {
                 fillColor = '#f59e0b';
-                radius = 3.5;
+                radius = 4.5;
               }
 
               return (
                 <g key={`pt-${i}`} className="cursor-pointer" onClick={() => setSelectedReading(r)}>
+                  {/* Subtle Anomaly Aura */}
                   {r.classification === 'strong_anomaly' && (
                     <circle
                       cx={cx}
                       cy={cy}
-                      r={radius * 1.8}
-                      fill="#e11d48"
-                      fillOpacity="0.15"
+                      r={radius * 2.5}
+                      fill="url(#miniStrongGlow)"
+                      className="pointer-events-none"
                     />
                   )}
+                  {/* Sensor Reading Dot */}
                   <circle
                     cx={cx}
                     cy={cy}
                     r={radius}
                     fill={fillColor}
                     stroke={isSelected ? '#2563eb' : '#ffffff'}
-                    strokeWidth={isSelected ? 2 : 0.75}
+                    strokeWidth={isSelected ? 2 : 1}
                   />
                 </g>
               );
@@ -109,10 +135,10 @@ export const CompactHeatmapCard: React.FC<CompactHeatmapCardProps> = ({ onOpenSu
           </svg>
 
           {/* Coordinate axis tags */}
-          <div className="absolute bottom-1 left-2 text-[9px] font-mono text-slate-400">(0, 0)</div>
-          <div className="absolute bottom-1 right-2 text-[9px] font-mono text-slate-400">(60, 0)</div>
-          <div className="absolute top-1 left-2 text-[9px] font-mono text-slate-400">(0, 60)</div>
-          <div className="absolute top-1 right-2 text-[9px] font-mono text-slate-400">(60, 60)</div>
+          <div className="absolute bottom-1 left-2 text-[9px] font-mono text-slate-400 font-medium">(0, 0)</div>
+          <div className="absolute bottom-1 right-2 text-[9px] font-mono text-slate-400 font-medium">({maxCoord}, 0)</div>
+          <div className="absolute top-1 left-2 text-[9px] font-mono text-slate-400 font-medium">(0, {maxCoord})</div>
+          <div className="absolute top-1 right-2 text-[9px] font-mono text-slate-400 font-medium">({maxCoord}, {maxCoord})</div>
         </div>
 
         {/* Legend pills */}

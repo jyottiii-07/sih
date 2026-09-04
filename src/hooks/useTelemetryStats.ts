@@ -17,7 +17,7 @@ export function useTelemetryStats(): TelemetryStats {
         averageAnomalyScore: 0,
         latestReading: null,
         activeSensorId: 'N/A',
-        surveyGridBounds: { minX: 0, maxX: 60, minY: 0, maxY: 60 },
+        surveyGridBounds: { minX: 0, maxX: 50, minY: 0, maxY: 50 },
       };
     }
 
@@ -60,9 +60,9 @@ export function useTelemetryStats(): TelemetryStats {
       activeSensorId: latestReading.sensor_id,
       surveyGridBounds: {
         minX: isFinite(minX) ? Math.floor(minX) : 0,
-        maxX: isFinite(maxX) ? Math.ceil(maxX) : 60,
+        maxX: isFinite(maxX) ? Math.max(50, Math.ceil(maxX)) : 50,
         minY: isFinite(minY) ? Math.floor(minY) : 0,
-        maxY: isFinite(maxY) ? Math.ceil(maxY) : 60,
+        maxY: isFinite(maxY) ? Math.max(50, Math.ceil(maxY)) : 50,
       },
     };
   }, [readings]);

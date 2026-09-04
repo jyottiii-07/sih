@@ -16,9 +16,9 @@ const DEFAULT_CONFIG: GridConfig = {
   viewBoxHeight: 600,
   padding: 40,
   gridMinX: 0,
-  gridMaxX: 60,
+  gridMaxX: 50,
   gridMinY: 0,
-  gridMaxY: 60,
+  gridMaxY: 50,
 };
 
 export function useSurveyGrid(config: Partial<GridConfig> = {}) {

@@ -131,11 +131,12 @@ void resetSurveyCoordinates() {
 // 6. WAYPOINT CAPTURE & HTTP TRANSMISSION
 // ==============================================================================
 void captureAndTransmitWaypoint(int effective_adc, String classification) {
-  float x_coord = current_col * STEP_SIZE;
-  float y_coord = current_row * STEP_SIZE;
+  // Center coordinate in middle of 10x10 cell zone (5.0, 15.0, 25.0, 35.0, 45.0)
+  float x_coord = current_col * STEP_SIZE + (STEP_SIZE / 2.0);
+  float y_coord = current_row * STEP_SIZE + (STEP_SIZE / 2.0);
 
   Serial.println("\n--------------------------------------------------------------------------------");
-  Serial.printf("[WAYPOINT CAPTURE TRIGGERED] Cell (%d, %d) -> Target Coords: (X: %.1f, Y: %.1f)\n",
+  Serial.printf("[WAYPOINT CAPTURE TRIGGERED] Cell (%d, %d) -> FEA Cell Center: (X: %.1f, Y: %.1f)\n",
     current_col, current_row, x_coord, y_coord);
   Serial.printf("Sensor Signal: EFF_ADC = %d | %s\n", effective_adc, classification.c_str());
 
@@ -191,9 +192,9 @@ void captureAndTransmitWaypoint(int effective_adc, String classification) {
     blinkLed(1, 100, 50);
   }
 
-  float next_x = current_col * STEP_SIZE;
-  float next_y = current_row * STEP_SIZE;
-  Serial.printf(">>> [NEXT TARGET] Move sensor to Cell (%d, %d) -> (X: %.1f, Y: %.1f) & Press BOOT\n",
+  float next_x = current_col * STEP_SIZE + (STEP_SIZE / 2.0);
+  float next_y = current_row * STEP_SIZE + (STEP_SIZE / 2.0);
+  Serial.printf(">>> [NEXT TARGET] Move sensor to Cell (%d, %d) -> Center: (X: %.1f, Y: %.1f) & Press BOOT\n",
     current_col, current_row, next_x, next_y);
   Serial.println("--------------------------------------------------------------------------------\n");
 }
@@ -348,9 +349,9 @@ void loop() {
   // --- Step 6: Live Diagnostic Serial Output (Every 300ms) ---
   if (now - last_serial_print_time >= SERIAL_PRINT_INTERVAL_MS) {
     last_serial_print_time = now;
-    float current_x = current_col * STEP_SIZE;
-    float current_y = current_row * STEP_SIZE;
-    Serial.printf("[MONITOR] A0: %4d | D0: %2lu | Smooth: %4.1f | EFF_ADC: %4d | %-28s | Target: (%d,%d) @ (X:%.0f, Y:%.0f)\n",
+    float current_x = current_col * STEP_SIZE + (STEP_SIZE / 2.0);
+    float current_y = current_row * STEP_SIZE + (STEP_SIZE / 2.0);
+    Serial.printf("[MONITOR] A0: %4d | D0: %2lu | Smooth: %4.1f | EFF_ADC: %4d | %-28s | Target: Cell (%d,%d) Center: (X:%.1f, Y:%.1f)\n",
       raw_adc, pulses, smoothed_chatter, effective_adc, classification.c_str(), current_col, current_row, current_x, current_y);
   }
 

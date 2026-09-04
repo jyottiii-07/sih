@@ -148,7 +148,7 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
             <label className="text-[11px] uppercase font-mono text-slate-500 block mb-1">Max X:</label>
             <input
               type="number"
-              placeholder="60"
+              placeholder="50"
               value={filters.maxX ?? ''}
               onChange={(e) =>
                 onFilterChange((prev) => ({
@@ -178,7 +178,7 @@ export const TableFilters: React.FC<TableFiltersProps> = ({
             <label className="text-[11px] uppercase font-mono text-slate-500 block mb-1">Max Y:</label>
             <input
               type="number"
-              placeholder="60"
+              placeholder="50"
               value={filters.maxY ?? ''}
               onChange={(e) =>
                 onFilterChange((prev) => ({
