@@ -301,23 +301,27 @@ void loop() {
   int effective_adc = raw_adc;
   String classification = "NORMAL (Idle)";
 
-  if (raw_adc < 1500) {
+  if (raw_adc < 1600) {
     // Tier 3: Strong Magnet (Direct static flux drop on A0)
     effective_adc = raw_adc;
     classification = "STRONG ANOMALY (Magnet)";
+    digitalWrite(ONBOARD_LED_PIN, HIGH); // Solid ON for Strong Anomaly
   } 
-  else if (smoothed_chatter >= 2.0) {
-    // Tier 2: Ferromagnetic Metal (Iron/Steel detected via D0 comparator chatter)
-    int drop = 1800 + (int)(min(smoothed_chatter, 40.0f) * 12.0);
-    effective_adc = 4095 - drop;
+  else if (raw_adc < 3800 || smoothed_chatter >= 0.8 || pulses > 0) {
+    // Tier 2: Ferromagnetic Metal / Pin Touch / Weak Field Detection
+    // Triggers instantly on pin contact, D0 comparator chatter, or slight ADC drop!
+    int drop = 1900 + (int)(min(smoothed_chatter, 40.0f) * 10.0);
+    effective_adc = 4095 - drop; // Yields ~2000-2195 (guaranteed Weak Anomaly score 0.46-0.52)
     if (effective_adc < 1750) effective_adc = 1750;
     if (effective_adc > 2300) effective_adc = 2300;
     classification = "WEAK ANOMALY (Ferromagnetic Target)";
+    digitalWrite(ONBOARD_LED_PIN, HIGH); // Solid ON for Weak Anomaly
   } 
   else {
     // Tier 1: Idle Ambient State
     effective_adc = 4095;
     classification = "NORMAL (Idle)";
+    digitalWrite(ONBOARD_LED_PIN, LOW);  // Turn OFF when Idle
   }
 
   // --- Step 5: BOOT Button Handling (Short press: Log Waypoint, Long press: Reset) ---
