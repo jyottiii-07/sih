@@ -29,8 +29,10 @@ router = APIRouter()
 
 async def _process_single_reading(raw_dict: Dict[str, Any]) -> Dict[str, Any]:
     """Helper to normalize, score, store, evaluate alerts, and broadcast a reading."""
+    print(f"\n[DEBUG 1. Raw FastAPI request payload]: {raw_dict}")
     # Pass through sensor normalization adapter layer (Hall-Effect or 3-Axis)
     norm = sensor_dispatcher.process(raw_dict)
+    print(f"[DEBUG 8b. Dispatcher normalized output]: magnetic_signal={norm.get('magnetic_signal')}, bz={norm.get('bz')}")
 
     # ML Anomaly inference
     ml_result = await classify_reading(norm)
@@ -49,6 +51,7 @@ async def _process_single_reading(raw_dict: Dict[str, Any]) -> Dict[str, Any]:
         "sensor_type": norm.get("sensor_type", "magnetometer_3axis"),
         "raw_payload": norm.get("raw_payload", raw_dict),
     }
+    print(f"[DEBUG 12. Final database/API doc]: magnetic_signal={doc['magnetic_signal']}, anomaly_score={doc['anomaly_score']}, classification={doc['classification']}")
 
     # Save to database
     saved_doc = await insert_reading(doc)
@@ -178,3 +181,18 @@ async def reset_readings():
         "message": f"Successfully deleted {deleted} survey records.",
         "deleted_count": deleted,
     }
+
+
+@router.post(
+    "/calibrate",
+    summary="Reset Hall-effect baseline calibration",
+)
+async def reset_calibration():
+    """Resets the in-memory Hall sensor baseline calibration state."""
+    sensor_dispatcher.hall_adapter.reset_calibration()
+    return {
+        "status": "success",
+        "message": "Hall baseline calibration reset. Next readings will establish the resting baseline.",
+        "default_baseline": sensor_dispatcher.hall_adapter.default_baseline,
+    }
+

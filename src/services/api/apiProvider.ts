@@ -128,6 +128,10 @@ export class ApiSensorProvider implements ISensorDataProvider {
       this.ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
+          // If message is an event envelope, ignore non-telemetry events
+          if (message.event && message.event !== 'sensor_reading' && message.event !== 'new_reading') {
+            return;
+          }
           const rawReading = message.payload || message;
           const result = validateSensorReading(rawReading);
 

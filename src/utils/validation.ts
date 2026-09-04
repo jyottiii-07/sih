@@ -34,8 +34,9 @@ export const SensorReadingSchema = z
       .max(1.0, 'anomaly_score cannot exceed 1.0'),
     classification: ClassificationSchema,
     sensor_type: z.string().optional(),
+    raw_payload: z.any().optional(),
   })
-  .strict();
+  .passthrough();
 
 export const SensorReadingBatchSchema = z.array(SensorReadingSchema);
 

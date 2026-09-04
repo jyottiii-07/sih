@@ -34,6 +34,8 @@ export interface SensorReading {
   classification: Classification;
   /** Sensing technology mode (e.g. 'hall_effect' or 'magnetometer_3axis') */
   sensor_type?: string;
+  /** Diagnostic metadata payload (e.g. raw_adc, baseline_adc, deviation) */
+  raw_payload?: Record<string, any>;
 }
 
 /**

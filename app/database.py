@@ -98,6 +98,8 @@ async def insert_reading(doc: Dict[str, Any]) -> Dict[str, Any]:
         "magnetic_signal": magnetic_signal,
         "anomaly_score": anomaly_score,
         "classification": classification,
+        "sensor_type": doc.get("sensor_type", "magnetometer_3axis"),
+        "raw_payload": doc.get("raw_payload", {}),
     }
 
 
@@ -108,7 +110,7 @@ async def get_readings(
     sort_desc: bool = False,
 ) -> List[Dict[str, Any]]:
     """Fetches historical readings matching query criteria."""
-    query = "SELECT sensor_id, timestamp, x, y, bx, by, bz, magnetic_signal, anomaly_score, classification FROM readings"
+    query = "SELECT sensor_id, timestamp, x, y, bx, by, bz, magnetic_signal, anomaly_score, classification, raw_payload FROM readings"
     params = []
     conditions = []
 
@@ -130,8 +132,16 @@ async def get_readings(
         db.row_factory = aiosqlite.Row
         async with db.execute(query, params) as cursor:
             rows = await cursor.fetchall()
-            return [
-                {
+            results = []
+            for row in rows:
+                stype = "magnetometer_3axis"
+                if row["raw_payload"]:
+                    try:
+                        p = json.loads(row["raw_payload"])
+                        stype = p.get("sensor_type", stype)
+                    except Exception:
+                        pass
+                results.append({
                     "sensor_id": row["sensor_id"],
                     "timestamp": row["timestamp"],
                     "x": row["x"],
@@ -142,14 +152,14 @@ async def get_readings(
                     "magnetic_signal": row["magnetic_signal"],
                     "anomaly_score": row["anomaly_score"],
                     "classification": row["classification"],
-                }
-                for row in rows
-            ]
+                    "sensor_type": stype,
+                })
+            return results
 
 
 async def get_latest_reading(sensor_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
     """Returns the most recent single reading."""
-    query = "SELECT sensor_id, timestamp, x, y, bx, by, bz, magnetic_signal, anomaly_score, classification FROM readings"
+    query = "SELECT sensor_id, timestamp, x, y, bx, by, bz, magnetic_signal, anomaly_score, classification, raw_payload FROM readings"
     params = []
     if sensor_id:
         query += " WHERE sensor_id = ?"
@@ -162,6 +172,13 @@ async def get_latest_reading(sensor_id: Optional[str] = None) -> Optional[Dict[s
             row = await cursor.fetchone()
             if not row:
                 return None
+            stype = "magnetometer_3axis"
+            if row["raw_payload"]:
+                try:
+                    p = json.loads(row["raw_payload"])
+                    stype = p.get("sensor_type", stype)
+                except Exception:
+                    pass
             return {
                 "sensor_id": row["sensor_id"],
                 "timestamp": row["timestamp"],
@@ -173,6 +190,7 @@ async def get_latest_reading(sensor_id: Optional[str] = None) -> Optional[Dict[s
                 "magnetic_signal": row["magnetic_signal"],
                 "anomaly_score": row["anomaly_score"],
                 "classification": row["classification"],
+                "sensor_type": stype,
             }
 
 

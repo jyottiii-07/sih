@@ -91,7 +91,12 @@ class HallEffectSensorAdapter:
         if self._calibrated_baseline is None:
             self._initial_readings.append(adc_val)
             if len(self._initial_readings) >= self.calibration_samples:
-                self._calibrated_baseline = float(np.median(self._initial_readings))
+                median_val = float(np.median(self._initial_readings))
+                # Sanity check: resting baseline should not be near 0 (which indicates magnet is touching sensor during boot)
+                if median_val > 1000.0:
+                    self._calibrated_baseline = median_val
+                else:
+                    self._calibrated_baseline = self.default_baseline
             current_baseline = self._calibrated_baseline if self._calibrated_baseline is not None else self.default_baseline
         else:
             current_baseline = self._calibrated_baseline
@@ -103,13 +108,18 @@ class HallEffectSensorAdapter:
         filtered_adc = float(np.median(self._recent_readings))
 
         # 3. Baseline Deviation
-        # Since magnet presence lowers the ADC towards 0:
-        deviation = max(0.0, current_baseline - filtered_adc)
+        # Uses absolute deviation to support both magnetic polarities and bias field perturbation
+        deviation = abs(current_baseline - filtered_adc)
 
         # 4. Dynamic Range & Normalization
         dynamic_range = max(1.0, current_baseline - self.min_floor)
         s_norm = max(0.0, min(1.0, deviation / dynamic_range))
         s_norm = round(s_norm, 4)
+
+        print(f"[DEBUG 5. Hall baseline]: current_baseline={current_baseline}")
+        print(f"[DEBUG 6. Hall adapter filtered_adc]: filtered_adc={filtered_adc}")
+        print(f"[DEBUG 7. Hall adapter deviation]: deviation={deviation}")
+        print(f"[DEBUG 8. Hall adapter s_norm]: s_norm={s_norm}")
 
         # 5. Backward-Compatible Contract Representation
         # Note: bx=0, by=0, bz=s_norm is purely a 1D compatibility mapping, NOT physically measured 3-axis data.
@@ -193,11 +203,20 @@ class SensorAdapterDispatcher:
         Auto-detects payload format and returns a normalized dictionary.
         """
         sensor_type = payload.get("sensor_type")
-        raw_adc = payload.get("raw_adc") or payload.get("adc") or payload.get("raw_hall_value")
+        
+        # Explicit check preserving 0 (0 is a valid ADC reading, not None)
+        print(f"[DEBUG 2. SensorAdapterDispatcher.process]: incoming payload={payload}")
+        raw_adc = payload.get("raw_adc")
+        if raw_adc is None:
+            raw_adc = payload.get("adc")
+        if raw_adc is None:
+            raw_adc = payload.get("raw_hall_value")
+        print(f"[DEBUG 3. Dispatcher raw_adc extracted]: raw_adc={raw_adc} (type={type(raw_adc).__name__ if raw_adc is not None else 'None'})")
 
         # Explicit or auto-detected Hall Effect payload
         if sensor_type == "hall_effect" or raw_adc is not None:
             adc_val = float(raw_adc) if raw_adc is not None else 4095.0
+            print(f"[DEBUG 4. Dispatcher adc_val passed to adapter]: adc_val={adc_val}")
             return self.hall_adapter.process_raw_reading(
                 raw_adc=adc_val,
                 x=float(payload.get("x", 0.0)),

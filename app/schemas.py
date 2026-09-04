@@ -8,10 +8,10 @@ from datetime import datetime
 # ---------------------------------------------------------------------------
 
 class RawSensorReadingIn(BaseModel):
-    sensor_id: Optional[str] = "SFS-001"
+    sensor_id: Optional[str] = "ESP32-HALL-01"
     timestamp: Optional[str] = None
-    x: float
-    y: float
+    x: Optional[float] = 0.0
+    y: Optional[float] = 0.0
     bx: Optional[float] = 0.0
     by: Optional[float] = 0.0
     bz: Optional[float] = 0.0

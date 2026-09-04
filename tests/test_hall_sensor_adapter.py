@@ -129,3 +129,59 @@ def test_3axis_magnetometer_unchanged_behavior():
     assert "magnetic_signal" in ml_mag
     assert "anomaly_score" in ml_mag
     assert ml_mag["classification"] in ["normal", "weak_anomaly", "strong_anomaly"]
+
+
+def test_hall_ingestion_without_coordinates():
+    """Verifies that physical ESP32 payload omitting x/y validates and processes cleanly."""
+    from app.schemas import RawSensorReadingIn
+    from app.routes import _process_single_reading
+
+    # 1. Pydantic validation with ONLY sensor_id, sensor_type, raw_adc
+    payload = {
+        "sensor_id": "ESP32-HALL-01",
+        "sensor_type": "hall_effect",
+        "raw_adc": 3950,
+    }
+    validated = RawSensorReadingIn(**payload)
+    assert validated.sensor_id == "ESP32-HALL-01"
+    assert validated.sensor_type == "hall_effect"
+    assert validated.raw_adc == 3950.0
+    assert validated.x == 0.0
+    assert validated.y == 0.0
+
+    # 2. Process reading through end-to-end route processor
+    processed = asyncio.run(_process_single_reading(validated.model_dump()))
+    assert processed["sensor_id"] == "ESP32-HALL-01"
+    assert processed["sensor_type"] == "hall_effect"
+    assert processed["classification"] in ["normal", "weak_anomaly", "strong_anomaly"]
+    assert "magnetic_signal" in processed
+    assert "anomaly_score" in processed
+    assert processed["x"] == 0.0
+    assert processed["y"] == 0.0
+
+
+def test_hall_zero_adc_strong_anomaly():
+    """Explicitly verifies that raw_adc=0 is NOT treated as falsy/None and maps to strong anomaly."""
+    from app.sensor_adapters import sensor_dispatcher
+    from app.routes import _process_single_reading
+
+    # Reset calibration and establish baseline with 4095
+    sensor_dispatcher.hall_adapter.reset_calibration()
+    for _ in range(10):
+        sensor_dispatcher.process({"sensor_type": "hall_effect", "raw_adc": 4095})
+
+    # Send raw_adc = 0 (direct magnet contact)
+    zero_payload = {
+        "sensor_id": "ESP32-HALL-01",
+        "sensor_type": "hall_effect",
+        "raw_adc": 0,
+    }
+    processed = asyncio.run(_process_single_reading(zero_payload))
+
+    assert processed["magnetic_signal"] == 1.0, f"Expected 1.0, got {processed['magnetic_signal']}"
+    assert processed["anomaly_score"] == 1.0, f"Expected 1.0, got {processed['anomaly_score']}"
+    assert processed["classification"] == "strong_anomaly"
+    assert processed["raw_payload"]["raw_adc"] == 0.0
+    assert processed["raw_payload"]["deviation"] == 4095.0
+
+

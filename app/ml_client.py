@@ -41,6 +41,7 @@ async def classify_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     # --- Mode 1: Single-Axis Hall-Effect Sensor ---
     if sensor_type == "hall_effect":
+        print(f"[DEBUG 9. classify_reading input]: payload sensor_type={sensor_type}, magnetic_signal={payload.get('magnetic_signal')}, bz={payload.get('bz')}")
         # Hall normalized signal S_norm in [0.0, 1.0] derived from baseline deviation
         s_norm = float(payload.get("magnetic_signal", payload.get("bz", 0.0)))
         anomaly_score = round(max(0.0, min(1.0, s_norm)), 4)
@@ -52,6 +53,9 @@ async def classify_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
         else:
             classification = "normal"
             
+        print(f"[DEBUG 10. anomaly_score]: anomaly_score={anomaly_score}")
+        print(f"[DEBUG 11. classification]: classification={classification}")
+
         return {
             "magnetic_signal": anomaly_score,
             "anomaly_score": anomaly_score,

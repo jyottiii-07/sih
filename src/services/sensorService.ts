@@ -34,8 +34,16 @@ export function getSensorDataProvider(): ISensorDataProvider {
     if (useMock) {
       providerInstance = new MockSensorProvider();
     } else {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
-      const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/telemetry';
+      let apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+      let wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/telemetry';
+
+      // Auto-adapt if accessed via local network IP (e.g. from phone or another device)
+      if (typeof window !== 'undefined' && window.location && window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const host = window.location.hostname;
+        apiBaseUrl = `http://${host}:8000/api/v1`;
+        wsUrl = `ws://${host}:8000/ws/telemetry`;
+      }
+
       providerInstance = new ApiSensorProvider(apiBaseUrl, wsUrl);
     }
   }
